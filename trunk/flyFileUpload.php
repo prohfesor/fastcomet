@@ -1,6 +1,5 @@
 <?php
 
-
 	class flyFileUpload {
 
 		var $aErrors = array();
@@ -20,25 +19,22 @@
 
 
 		function &getInstance() {
-			global $instance;
-			if ($instance === null) {
-				$instance = new flyFileUpload("FileUploadPass");
+			global $instancefu;
+			if ($instancefu === null) {
+				$instancefu = new flyFileUpload("FileUploadPass");
 			}
 
-			return $instance;
+			return $instancefu;
 		}
 
 
-		/*
-		 * Executes file uploading.
-		 * @param $file_id - file id set in html input element
-		 * @param $path - path for file to upload.
-		 * If specified with filename, then this is a new name for file.
-		 * If specified is a directory, then original filename saved.
-		 * @param $type - if set, then file is moved only if
-		 * filetype is correct.
-		 */
-		function get($file_id, $path, $type =null) {
+		/**
+		 * Checks file uploading.
+		 * Returns uploaded file name, or FALSE in wrong case. 
+		 * @param $file_id
+		 * @return string
+		 */		
+		function find($file_id, $type=null) {
 			$file =& $_FILES[$file_id];
 			$aErrors =& $this->aErrors; $aErrors = array();
 			//check if such file was uploaded
@@ -52,7 +48,28 @@
 			}
 			//check filetype?
 			if(!empty($type) && $file['type']!==$type) {
+				//TODO: check filetype of uploaded file correctly
 				$aErrors[] = "2: Wrong file type";
+				return false;
+			}
+			
+			return $file;
+		}
+		
+		
+		
+		/*
+		 * Executes file uploading.
+		 * @param $file_id - file id set in html input element
+		 * @param $path - path for file to upload.
+		 * If specified with filename, then this is a new name for file.
+		 * If specified is a directory, then original filename saved.
+		 * @param $type - if set, then file is moved only if
+		 * filetype is correct.
+		 */
+		function get($file_id, $path, $type =null) {
+			$file = $this->find($file_id, $type);
+			if($file ===false){
 				return false;
 			}
 			//save original filename?
@@ -78,6 +95,5 @@
 
 
 	}
-
 
 ?>
