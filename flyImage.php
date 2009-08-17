@@ -12,7 +12,7 @@ class flyImage {
 	var $image_pixels;
 	var $image_pixels_backup;
 	var $filename;
-	var $filename_original;
+	var $filename_save;
 	var $type;
 	var $mime;
 	var $jpgquality =90;
@@ -48,7 +48,7 @@ class flyImage {
 		}
 		
 		$this->filename = $filename;
-		$this->filename_original = basename($filename);
+		$this->filename_save = basename($filename);
 		$this->type = $aInfo[2];
 		$this->mime = $aInfo['mime'];
 		
@@ -80,7 +80,7 @@ class flyImage {
 	 */
 	function save( $filename ='' , $jpgquality =null ) {
 		if(is_dir($filename)) {
-			$filename = $filename.$this->filename_original;
+			$filename = $filename.$this->filename_save;
 		}
 		if(is_file($filename)){
 			$this->aErrors[] = "4: Filename already exists";
