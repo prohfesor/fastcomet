@@ -200,7 +200,7 @@ class flyErrorSettings {
     	$this->handle_all_errors = 0;
     	$this->halt_php_handling = 0;
     	$this->pre_cnt = 0;
-    	$this->pre_errs   = '^<div id="div_errS" style="position: absolute; left: 0; top: 0; width: 100%;"></div>';
+    	$this->pre_errs   = '^<div id="div_errS" style="position: absolute; left: 0; top: 0; width: 100%; z-index: 9999;"></div>';
     	$this->pre_errmsg = ' <div id="div_errD" style="padding: 0 10px; background-color: #ffd; border-bottom: 1px solid #999;">' .
     						'<b>%ERROR%</b> <span id="errDshw">[<a href="#" onclick="document.getElementById(\'errD\').style.display=\'\'; document.getElementById(\'errDhde\').style.display=\'\'; document.getElementById(\'errDshw\').style.display=\'none\'; return false">show</a>]</span>' .
     						 '<span id="errDhde" style="display: none;">[<a href="#" onclick="document.getElementById(\'errD\').style.display=\'none\'; document.getElementById(\'errDshw\').style.display=\'\'; document.getElementById(\'errDhde\').style.display=\'none\'; return false">hide</a>]</span>' .
