@@ -13,7 +13,6 @@ class flyImage {
 	var $image_pixels_backup;
 	var $filename;
 	var $filename_original;
-	var $aDimensions;
 	var $type;
 	var $mime;
 	var $jpgquality =90;
@@ -52,7 +51,6 @@ class flyImage {
 		$this->filename_original = basename($filename);
 		$this->type = $aInfo[2];
 		$this->mime = $aInfo['mime'];
-		$this->aDimensions = array('0'=>$aInfo[0], '1'=>$aInfo[1], 'x'=>$aInfo[0], 'y'=>$aInfo[1]);
 		
 		switch($this->type) {
 			case IMG_JPG:
@@ -123,8 +121,8 @@ class flyImage {
 	 * Warning! This erases original picture, be careful with this option.
 	 */
 	function resize($width, $height, $mode =RESIZE_MODE_STRICT, $autosave =0) {
-		$width_orig  = $this->aDimensions[0];
-		$height_orig = $this->aDimensions[1];
+		$width_orig  = imagesx($this->image_pixels);
+		$height_orig = imagesy($this->image_pixels);
 		switch ($mode) {
 			case RESIZE_MODE_STRICT:
 				$new_width = $width;
@@ -154,11 +152,10 @@ class flyImage {
 				die("Image clippin is not yet implemented");
 				break;
 		}
-		flydebug::dump($new_width);
-		flydebug::dump($new_height);
 		$this->image_pixels_backup = $this->image_pixels;
 		$image_p = imagecreatetruecolor($new_width, $new_height);
-		imagecopyresampled($image_p, $this->image_pixels, 0, 0, 0, 0, $new_width, $new_height, $width_orig, $height_orig);
+		$image_o = $this->image_pixels;
+		imagecopyresampled($image_p, $image_o, 0, 0, 0, 0, $new_width, $new_height, $width_orig, $height_orig);
 		$this->image_pixels = $image_p;
 		if($autosave){
 			unlink($this->filename);
@@ -173,8 +170,8 @@ class flyImage {
 	 */
 	//TODO: recalc image downsample formulas
 	function downsample($width, $height, $mode =RESIZE_MODE_STRICT, $autosave =0){
-		$width_orig  =& $this->aDimensions[0];
-		$height_orig =& $this->aDimensions[1];
+		$width_orig  = imagesx($this->image_pixels);
+		$height_orig = imagesy($this->image_pixels);
 		$ratio_orig = $width_orig/$height_orig;
 		switch ($mode) {
 			case RESIZE_MODE_STRICT:
