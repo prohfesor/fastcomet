@@ -1,10 +1,10 @@
 <?php
 
-	define('RESIZE_MODE_STRICT', 0);
-	define('RESIZE_MODE_FIT', 1);
-	define('RESIZE_MODE_WIDTH', 2);
-	define('RESIZE_MODE_HEIGHT', 3);
-	define('RESIZE_MODE_CLIP', 4);
+define('RESIZE_MODE_STRICT', 0);
+define('RESIZE_MODE_FIT', 1);
+define('RESIZE_MODE_WIDTH', 2);
+define('RESIZE_MODE_HEIGHT', 3);
+define('RESIZE_MODE_CLIP', 4);
 
 class flyImage {
 
@@ -17,8 +17,11 @@ class flyImage {
 	var $mime;
 	var $jpgquality =90;
 	var $aErrors = array();
+	var $extension_autodetect =1;
+	var $duplicate_replace =0;
+	var $duplicate_increment_suffix =1;
 
-	
+
 	// constructor
 	function flyImage( $filename ='') {
 		if(!empty($filename)){
@@ -30,7 +33,7 @@ class flyImage {
 	/**
 	 * Reads image file into $this->image_pixels
 	 * Computes image dimensions in $this->aDimensions
-	 * If file has unknown image format, or no such file - returns false  
+	 * If file has unknown image format, or no such file - returns false
 	 * @param $filename
 	 * @return bool
 	 */
@@ -39,48 +42,104 @@ class flyImage {
 			$this->aErrors[] = "1: File not exists";
 			return false;
 		}
-		
+
 		$aInfo = getimagesize($filename);
-		
+
 		if (false == $aInfo) {
 			$this->aErrors[] = "2: Unrecognized image format";
-			return false; 	
+			return false;
 		}
-		
+
 		$this->filename = $filename;
 		$this->filename_save = basename($filename);
 		$this->type = $aInfo[2];
 		$this->mime = $aInfo['mime'];
-		
-		switch($this->type) {
-			case IMG_JPG:
+
+		switch($this->mime) {
+			case 'image/jpeg':
 				$this->image_pixels = imagecreatefromjpeg($filename);
 				break;
-			case IMG_GIF:
+			case 'image/gif':
 				$this->image_pixels = imagecreatefromgif($filename);
 				break;
-			case IMG_PNG:
+			case 'image/png':	
 				$this->image_pixels = imagecreatefrompng($filename);
-				break;		
-			case IMG_WBMP:
+				break;
+			case 'image/vnd.wap.wbmp':
 				$this->image_pixels = imagecreatefromwbmp($filename);
-				break;			
+				break;
 			default:
 				$this->aErrors[] = "3: Unsupported image type";
-				return false;	
+				return false;
 		}
-		
+
+		return $filename;
+	}
+
+
+	/**
+	 * Replaces filename extension with new extension, according to detected $this->type.
+	 * Adds extension, if not present.
+	 * @param $filename
+	 * @return string
+	 */
+	function extension_detect($filename =''){
+		if(empty($filename)) {
+			$filename = $this->filename;
+		}
+		switch($this->mime) {
+			case 'image/jpeg':
+				$extension = "jpg";
+				break;
+			case 'image/gif':
+				$extension = "gif";
+				break;
+			case 'image/png':
+				$extension = "png";
+				break;
+			case 'image/vnd.wap.wbmp':
+				$extension = "bmp";
+				break;
+			default:
+				$this->aErrors[] = "3: Unsupported image type";
+				return $filename;	
+		}
+		$aPathInfo = pathinfo($filename);
+		$filename = $aPathInfo['dirname']."/".$aPathInfo['filename'].".".$extension;
+		return $filename;
+	}
+
+	
+	function duplicate_increment_suffix($filename){
+		$aPathInfo = pathinfo($filename);
+		$suffix =1;
+		while(is_file($filename)){
+			$filename = "{$aPathInfo['dirname']}/{$aPathInfo['filename']}_{$suffix}.{$aPathInfo['extension']}";
+			$suffix++;
+		}
 		return $filename;
 	}
 	
-	
+
 	/**
 	 * Saves picture with a filename specified in $filename.
-	 * If no filename specified - original filename used. 
+	 * If no filename specified - original filename used.
 	 */
 	function save( $filename ='' , $jpgquality =null ) {
 		if(is_dir($filename)) {
 			$filename = $filename.$this->filename_save;
+		}
+		if(empty($jpgquality)){
+			$jpgquality = $this->jpgquality;
+		}
+		if($this->extension_autodetect){
+			$filename = $this->extension_detect($filename);
+		}
+		if($this->duplicate_replace && is_file($filename)){
+			@unlink($filename);
+		}
+		if($this->duplicate_increment_suffix && is_file($filename)){
+			$filename = $this->duplicate_increment_suffix($filename);	
 		}
 		if(is_file($filename)){
 			$this->aErrors[] = "4: Filename already exists";
@@ -90,31 +149,27 @@ class flyImage {
 			$this->aErrors[] = "5: Unable to write specified file. Possible access denied";
 			return false;
 		}
-		if(empty($jpgquality)){
-			$jpgquality = $this->jpgquality;
-		}
-		
-		switch($this->type) {
-			case IMG_JPG:
+		switch($this->mime) {
+			case 'image/jpeg':
 				imagejpeg($this->image_pixels, $filename, $jpgquality);
 				break;
-			case IMG_GIF:
+			case 'image/gif':
 				imagegif($this->image_pixels, $filename);
 				break;
-			case IMG_PNG:
+			case 'image/png':
 				imagepng($this->image_pixels, $filename);
-				break;		
-			case IMG_WBMP:
+				break;
+			case 'image/vnd.wap.wbmp':
 				imagewbmp($this->image_pixels, $filename);
-				break;	
+				break;
 			default:
 				$this->aErrors[] = "3: Unsupported image type";
-				return false;	
+				return false;
 		}
 		return $filename;
 	}
 
-	
+
 	/**
 	 * Resize picture, loaded by load(), applying desired resize mode.
 	 * If $autosave is set to TRUE - automatically saves image after resize.
@@ -149,7 +204,14 @@ class flyImage {
 				$new_width  = round( $height*$ratio_orig );
 				break;
 			case RESIZE_MODE_CLIP:
-				die("Image clippin is not yet implemented");
+				$ratio = $width/$height;
+				$new_width = $width;
+				$new_height = $height;
+				if($width/$ratio > $height_orig) {
+					$height_orig = round($width/$ratio);
+				} else {
+					$width_orig = round($height*$ratio);
+				}
 				break;
 		}
 		$this->image_pixels_backup = $this->image_pixels;
@@ -162,8 +224,8 @@ class flyImage {
 			$this->save($this->filename);
 		}
 	}
-	
-	
+
+
 	/**
 	 * Does the same as resize(), but prevents enlarging picture more
 	 * than original resolution
@@ -196,13 +258,20 @@ class flyImage {
 				$new_width  = round( $height*$ratio_orig );
 				break;
 			case RESIZE_MODE_CLIP:
-				die("Image clippin is not yet implemented");
+				$ratio = $width/$height;
+				$new_width = $width;
+				$new_height = $height;
+				if($width/$ratio > $height_orig) {
+					$height_orig = round($width/$ratio);
+				} else {
+					$width_orig = round($height*$ratio);
+				}
 				break;
 		}
 		return $this->resize($width, $height, $mode, $autosave);
 	}
 
-	
+
 	function revert(){
 		$this->image_pixels = $this->image_pixels_backup;
 	}

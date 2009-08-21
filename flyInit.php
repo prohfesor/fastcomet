@@ -6,7 +6,6 @@
 	
 	require_once('flyDb.php');
 	$db = flyDb::getInstance();
-	$db->connect("localhost", "root", "", "biedcenter");
 	
 	if (get_magic_quotes_gpc()) {
 		new flyError("Magic quotes are on!");

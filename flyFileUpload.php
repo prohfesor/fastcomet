@@ -57,6 +57,16 @@
 		}
 		
 		
+		/**
+		 * Replace all characters in filename except letters, 
+		 * digits or "_" with underscores.
+		 * @param $filename
+		 * @return string
+		 */
+		function namesafe($filename) {
+			return ereg_replace('[^_A-z0-9]', '_', $filename);
+		}
+		
 		
 		/*
 		 * Executes file uploading.
