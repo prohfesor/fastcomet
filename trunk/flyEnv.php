@@ -88,7 +88,7 @@
 	 */
 	function getFloat($key, $default =0, $area =0) {
 		$value = $this->get($key, $default, $area);
-		if(is_float($value)) {
+		if(is_float((float)$value)) {
 			return $value;
 		} else {
 			return $default;

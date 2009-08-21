@@ -9,7 +9,7 @@ class flyImageUpload extends flyFileUpload {
 	
 	
 	function flyImageUpload($pass =null) {
-			flyFileUpload::getInstance();
+		flyFileUpload::getInstance();
 	}
 
 	
@@ -19,7 +19,7 @@ class flyImageUpload extends flyFileUpload {
 			return false;
 		}
 		$this->image = new flyImage( $aFile['tmp_name'] );
-		$this->image->filename_original = $aFile['name'];
+		$this->image->filename_save = $aFile['name'];
 		return $this->image;
 	}
 	
