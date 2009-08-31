@@ -15,12 +15,12 @@
 
 	var $connected =false;
 	var $lazy =true;
-	var $query_time =0;
+	var $last_insert_id = false;
 	var $total_queries =0;
-	var $time_taken =0;
+	var $time_taken_total =0;
+	var $time_taken =array();
 	var $last_query ="";
 	var $query_stack = array();
-	var $last_insert_id = false;
 
 	/**
 	 * @access private
@@ -119,8 +119,9 @@
 		 list($usec, $sec) = explode(" ", microtime());
 	 	$time = ((float)$usec+(float)$sec) - $time;
 
-		$this->time_taken =+ $time;
-		$this->total_queries =+ 1;
+		$this->time_taken[] = $time;
+	 	$this->time_taken_total += $time;
+		$this->total_queries += 1;
 		
 		$this->last_insert_id = mysql_insert_id();
 
