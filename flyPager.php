@@ -36,6 +36,16 @@
 			}
 			return $aPagers[$instance];
 		}
+		
+		
+		function setPage($page){
+			$this->page = $page;
+		}
+		
+		
+		function setPerPage($per_page){
+			$this->per_page = $per_page;
+		}
 
 
 		/**
