@@ -36,6 +36,20 @@ class func {
 	}
 
 
+	//---------------------------------------------------------//
+	// This function is created for compatibility              //
+	//---------------------------------------------------------//
+	/*
+	if(!function_exists('file_get_contents')){
+		function file_get_contents($file) {
+			if(!$file = file($file)) return false;
+			if(!$file = implode('', $file)) return false;
+			return $file;
+		}
+	}
+	*/
+
+	
 	/*
 	 * Write file archived in gzip.
 	 * Function similar to func::file_write_contents
@@ -53,21 +67,7 @@ class func {
 		unlink($file . '.lock');
 		return true;
 	}
-
-
-	//---------------------------------------------------------//
-	// This function is created for compatibility              //
-	//---------------------------------------------------------//
-	/*
-	if(!function_exists('file_get_contents')){
-		function file_get_contents($file) {
-			if(!$file = file($file)) return false;
-			if(!$file = implode('', $file)) return false;
-			return $file;
-		}
-	}
-	*/
-
+	
 
 	/*
 	 * Function reads file into array.

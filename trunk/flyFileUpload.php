@@ -94,7 +94,8 @@
  				@unlink($path);
  			}
 
-			return move_uploaded_file($file['tmp_name'] , $path);
+			move_uploaded_file($file['tmp_name'] , $path);
+			return $path;
 		}
 
 
