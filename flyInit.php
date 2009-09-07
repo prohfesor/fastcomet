@@ -1,5 +1,6 @@
 <?php 
-
+	require_once('flyFunc.php');
+	
 	require_once('flyEnv.php');
 
 	require_once('flySession.php');

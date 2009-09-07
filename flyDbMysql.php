@@ -200,13 +200,17 @@
 		if(!is_resource($this->result_link)) {
 			return false;
 		}
-
+		
+		if(!mysql_num_rows($this->result_link)){
+			return array();
+		}
+		
 		$row = mysql_fetch_assoc($this->result_link);
-		if(!array_key_exists($column, $row)) {
+		if(!isset($row[$column])) {
 			return new flyError("Incorrect column specified! (\"$column\")");
 		}
 
-		mysql_data_seek($this->result_link, 0);
+		@mysql_data_seek($this->result_link, 0);
 
 		while($row = mysql_fetch_assoc($this->result_link)) {
 			$result[] = $row[$column];
@@ -236,7 +240,7 @@
 			return new flyError("No specified column as Value! (\"$value\")");
 		}
 
-		mysql_data_seek($this->result_link, 0);
+		@mysql_data_seek($this->result_link, 0);
 
 		while($row = mysql_fetch_assoc($this->result_link)) {
 			$result[$row[$key]] = $row[$value];

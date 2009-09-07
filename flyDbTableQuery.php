@@ -11,7 +11,7 @@ class flyDbTableQuery extends flyDb {
 	var $aSortOrder  =array();
 	
 	
-	function flyDbTableQuery($from, $select, $aDefFilters='', $aSortOrder='', $connectionName =null){
+	function flyDbTableQuery($from, $select ='', $aDefFilters='', $aSortOrder='', $connectionName =null){
 		$this->from = $from;
 		$this->select = $select;
 		$this->aDefFilters = (!empty($aDefFilters)) ? (array)$aDefFilters : array();
@@ -63,10 +63,14 @@ class flyDbTableQuery extends flyDb {
 	 * @return string
 	 */
 	function _createQuery(){
-		// select
-		$select = $this->select;
 		//from
 		$from = $this->from;
+		if(empty($from))
+			return false;
+		// select
+		$select = $this->select;
+		if(empty($select))
+			$select = '*';
 		// where
 		$where = '';
 		if(!empty($this->aDefFilters) || !empty($this->aFilters)) {
