@@ -133,6 +133,11 @@
 	 */
 	function getBool($key, $default =false, $area =0) {
 		$value = $this->get($key, $default, $area);
+		switch($value){
+			case "true": $value = true; break;
+			case "false": $value = false; break;
+			default: $value = (bool)$value;
+		}
 		if(is_bool($value)) {
 			return $value;
 		} else {
