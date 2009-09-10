@@ -46,8 +46,13 @@
 		function setPerPage($per_page){
 			$this->per_page = $per_page;
 		}
-
-
+		
+		
+		function getPagesTotal(){
+			return $this->pages_total;
+		}
+		
+		
 		/**
 		 * Function tries to execute modified SQL query,
 		 * if specified class (object) allows this.
@@ -55,21 +60,26 @@
 		 * @param $object
 		 */
 		 function getObjects( &$object ) {
+		 	$page 	  =& $this->page;
+			$per_page =& $this->per_page;
 			if(is_array($object)) {
 				//truncate array
 				$this->pages_total = ceil (sizeof($object) / $this->per_page);
 				$aElems = $object;
-				$page =&	$this->page;
-				$per_page=&	$this->per_page;
 				array_splice($aElems, 0, ($page-1)*$per_page);	//beginning
 				array_splice($aElems, $per_page);				//trailing
 				return $aElems;
 			} elseif (is_object($object)) {
 				//fetch limited
-				if(!method_exists($object, 'get_objects')) {
+				if(!method_exists($object, 'getObjects')) {
 					return array();
 				} else {
-					// ... something TODO: get objects
+					@$object->limits( ($page-1)*$per_page , $per_page);
+					$aElems = $object->getObjects();
+					if(is_int((int)$rowstotal = $object->rows_total))
+						$this->pages_total = ceil($rowstotal / $this->per_page);
+					@$object->removeLimits();
+					return $aElems;
 				}
 			} else {
 
