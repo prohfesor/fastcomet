@@ -10,6 +10,8 @@
 	
 	require_once('flyDbTableQuery.php');
 	
+	require_once('flyMail.php');
+	
 	if (get_magic_quotes_gpc()) {
 		new flyError("Magic quotes are on!");
 	}
