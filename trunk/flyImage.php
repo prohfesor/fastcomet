@@ -237,8 +237,14 @@ class flyImage {
 		$ratio_orig = $width_orig/$height_orig;
 		switch ($mode) {
 			case RESIZE_MODE_STRICT:
-				$new_width = $width;
-				$new_height = $height;
+				//no resize
+				if($width<$new_width || $height<$new_height){
+					$new_width = $width_orig;
+					$new_height= $height_orig;
+				} else {
+					$new_width  = $width;
+					$new_height = $height;					
+				}
 				break;
 			case RESIZE_MODE_FIT:
 				if ($width/$height > $ratio_orig) {
@@ -248,14 +254,29 @@ class flyImage {
 					$new_height = round( $width/$ratio_orig );
 					$new_width  = $width;
 				}
+				//no resize
+				if($width<$new_width || $height<$new_height){
+					$new_width = $width_orig;
+					$new_height= $height_orig;
+				} 
 				break;
 			case RESIZE_MODE_WIDTH:
 				$new_height = round( $width/$ratio_orig );
 				$new_width  = $width;
+				//no resize
+				if($width<$new_width || $height<$new_height){
+					$new_width = $width_orig;
+					$new_height= $height_orig;
+				}
 				break;
 			case RESIZE_MODE_HEIGHT:
 				$new_height = $height;
 				$new_width  = round( $height*$ratio_orig );
+				//no resize
+				if($width<$new_width || $height<$new_height){
+					$new_width = $width_orig;
+					$new_height= $height_orig;
+				}
 				break;
 			case RESIZE_MODE_CLIP:
 				$ratio = $width/$height;
@@ -266,6 +287,11 @@ class flyImage {
 				} else {
 					$width_orig = round($height*$ratio);
 				}
+				//no resize
+				if($width<$new_width || $height<$new_height){
+					$new_width = $width_orig;
+					$new_height= $height_orig;
+				} 
 				break;
 		}
 		return $this->resize($width, $height, $mode, $autosave);
