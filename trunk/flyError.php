@@ -145,6 +145,8 @@ define("ERROR_DIE", 4);
 
         if($toHtml) {
         	$call_stack = str_replace( "\n", " <br>\n", $call_stack );
+        } else {
+        	$call_stack = "<pre>$call_stack</pre>";
         }
 
         return $call_stack;
@@ -196,8 +198,8 @@ class flyErrorSettings {
 		if($pass!="ErrorSettingsPass"){
 			return new flyError("Prohibited to call private constructor of Singleton class!");
 		}
-		$this->handlingMode = ERROR_TRIGGER;
-    	$this->handle_all_errors = 0;
+		$this->handlingMode = ERROR_TRIGGER_HTML;
+    	$this->handle_all_errors = 1;
     	$this->halt_php_handling = 0;
     	$this->pre_cnt = 0;
     	$this->pre_errs   = '^<div id="div_errS" style="position: absolute; left: 0; top: 0; width: 100%; z-index: 9999;"></div>';
