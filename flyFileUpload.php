@@ -30,7 +30,7 @@
 
 		/**
 		 * Checks file uploading.
-		 * Returns uploaded file name, or FALSE in wrong case. 
+		 * Returns uploaded file name, or FALSE otherwise. 
 		 * @param $file_id
 		 * @return string
 		 */		
