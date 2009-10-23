@@ -26,9 +26,7 @@ class flyMail {
 	  *  Specify $this->to, $this->from, $this->subject, $this->SenderName, $this->ReplyTo, $this->message
 	  */
 	 function send() {
-	 	//flyError::raise("TO: $this->to; SUBJECT: $this->subject; MESSAGE: $this->message; HEADERS: $headers");
 	 	//flyDebug::assert( "!empty($this->to) &&  (!empty($this->subject)" );
-
 		if(empty($this->from)) $this->from = "noreply@".$_SERVER['SERVER_NAME'];
 		if(!empty($this->SenderName) && !empty($this->from)) {
 			$headers = "From: $this->SenderName <$this->from>"."\r\n";
@@ -41,7 +39,7 @@ class flyMail {
 
 			$headers .= "X-Mailer: PHP/".phpversion()."\r\n";
 
-		mail($this->to, $this->subject, $this->message, $headers);
+		return mail($this->to, $this->subject, $this->message, $headers);
 	 }
 
 
