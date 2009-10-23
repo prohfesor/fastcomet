@@ -111,10 +111,11 @@
 	 	$time = ((float)$usec+(float)$sec);
 
 		$result = mysql_query($query);
+		$this->result_link = $result;
+		
 		if ($result === false) {
 			return new flyError("Error in DB query. Response: ".mysql_error() );
 		}
-		$this->result_link = $result;
 
 		 list($usec, $sec) = explode(" ", microtime());
 	 	$time = ((float)$usec+(float)$sec) - $time;
@@ -192,7 +193,7 @@
 	/**
 	 * Retrieve one column from query results
 	 */
-	 function fetch_column($query, $column) {
+	 function fetch_column($query, $column =null) {
 	 	$result = array();
 
 		$this->do_query($query);
@@ -206,6 +207,14 @@
 		}
 		
 		$row = mysql_fetch_assoc($this->result_link);
+	 	
+	 	if(!$row){
+	 		return array();
+	 	}
+		if(is_null($column)){
+			$keys = array_keys($row);
+			$column = $keys[0];
+		}
 		if(!isset($row[$column])) {
 			return new flyError("Incorrect column specified! (\"$column\")");
 		}
@@ -222,8 +231,10 @@
 
 	/**
 	 * Retrieve key=>value array
+	 * 'Key' and 'Value' are column names in query result
+	 * If names or one of them are empty, then first two columns are taken.  
 	 */
-	 function fetch_key_value($query, $key, $value) {
+	 function fetch_key_value($query, $key =null, $value =null) {
 		$result = array();
 
 		$this->do_query($query);
@@ -233,6 +244,21 @@
 		}
 
 		$row = mysql_fetch_assoc($this->result_link);
+		
+	 	if(!sizeof($row)){
+			return false;
+		}
+		
+	 	if(is_null($key) || is_null($value)){
+	 		$keys = array_keys($row);
+	 	}
+		if(is_null($key)){
+			$value = $keys[0];
+		}
+		if(is_null($value)){
+			$value = $keys[1];
+		}
+		
 		if(!array_key_exists($key, $row)) {
 			return new flyError("No specified column as Key! (\"$key\")");
 		}
@@ -252,17 +278,28 @@
 
 	/**
 	 * Retrieve one column from first row in result
+	 * 'Value' - is a column name in query result.
+	 * If column name not specified - first column is taken.
 	 */
-	 function fetch_value($query, $value) {
+	 function fetch_value($query, $value =null) {
 		$this->do_query($query);
 
 		if(!is_resource($this->result_link)) {
 			return false;
 		}
 
-		$row = mysql_fetch_object($this->result_link);
+		$row = mysql_fetch_assoc($this->result_link);
+		
+		if(!$row || !sizeof($row)){
+			return false;
+		}
+		
+		if(is_null($value)){
+			$keys = array_keys($row);
+			$value = $keys[0];
+		}
 
-		return $row->$value;
+		return $row[$value];
 	 }
 
 
