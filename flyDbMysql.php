@@ -245,17 +245,17 @@
 
 		$row = mysql_fetch_assoc($this->result_link);
 		
-	 	if(!sizeof($row)){
+	 	if(empty($row)){
 			return false;
 		}
 		
-	 	if(is_null($key) || is_null($value)){
+	 	if(empty($key) || empty($value)){
 	 		$keys = array_keys($row);
 	 	}
-		if(is_null($key)){
-			$value = $keys[0];
+		if(empty($key)){
+			$key = $keys[0];
 		}
-		if(is_null($value)){
+		if(empty($value)){
 			$value = $keys[1];
 		}
 		
