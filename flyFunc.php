@@ -218,6 +218,24 @@ class func {
 	 	$newfilter = (empty($filter))  ?	$newfilter  :  $newfilter." AND ($filter)" ;
 	 	return func::files_list($folder, $newfilter);
 	 }
+	 
+
+	 /*
+	 * @string $folder
+	 * @string $filter
+	 * @return mixed
+	 */
+	 function files_list_recursive($folder, $filter =""){
+	 	$res = array();
+	 	$cutoff = strlen($folder);
+	 	foreach($aFiles=func::files_list($folder, $filter) as $file){
+			$res[] = $file;
+			if(is_dir($folder.'/'.$file))
+				foreach(func::files_list_recursive($folder.'/'.$file, $filter) as $file_r)
+					$res[] = substr($folder.$file.'/'.$file_r, $cutoff);
+	 	}
+		return $res; 
+	 }
 
 
 	function generate_string($length =16, $symbols =null) {
