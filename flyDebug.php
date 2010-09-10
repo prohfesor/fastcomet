@@ -98,7 +98,7 @@ define ("DEBUG_TRIGGER_ERROR", 4);
 
 
     /**
-     * Call this to display 
+     * Call this to display script timing. Uses tick function to log stats.
 	 * Code evaluation script which uses debug_backtrace() to get execution time in ns, relative current line number, function, file, and calling function info on each tick, and shove it all in $script_stats array.  See debug_backtrace manual to customize what info is collected.
 	 *
 	 * Warning: this will exhaust allowed memory very easily, so adjust tick counter according to the size of your code.  Also, array_key_exists checking on debug_backtrace arrays is removed here only to keep this example simple, but should be added to avoid a large number of resulting PHP Notice errors.
@@ -136,7 +136,7 @@ define ("DEBUG_TRIGGER_ERROR", 4);
 			$debug->script_time = microtime(true);
 		}
 
-		//todo: add tmp dir detection
+		//TODO: add tmp dir detection
 		$temp_file = ini_get('upload_tmp_dir').'/flydebug_ticks.php';
     	file_put_contents($temp_file,"<? declare(ticks=$ticks) ?>");
     	require_once($temp_file);
