@@ -5,6 +5,7 @@ define('RESIZE_MODE_FIT', 1);
 define('RESIZE_MODE_WIDTH', 2);
 define('RESIZE_MODE_HEIGHT', 3);
 define('RESIZE_MODE_CLIP', 4);
+define('RESIZE_MODE_BORDERS', 5);
 
 class flyImage {
 
@@ -15,11 +16,13 @@ class flyImage {
 	var $filename_save;
 	var $type;
 	var $mime;
-	var $jpgquality =90;
 	var $aErrors = array();
-	var $extension_autodetect =1;
-	var $duplicate_replace =0;
-	var $duplicate_increment_suffix =1;
+	var $settings_jpg_quality =90;
+	var $settings_extension_autodetect =1;
+	var $settings_duplicate_replace =0;
+	var $settings_duplicate_increment_suffix =0;
+	var $settings_undo =1;
+	var $settings_resizeborders_color = "#ffffff";
 
 
 	// constructor
@@ -77,16 +80,8 @@ class flyImage {
 	}
 
 
-	/**
-	 * Replaces filename extension with new extension, according to detected $this->type.
-	 * Adds extension, if not present.
-	 * @param $filename
-	 * @return string
-	 */
-	function extension_detect($filename =''){
-		if(empty($filename)) {
-			$filename = $this->filename;
-		}
+	function get_ext_from_mime($mime =null){
+		if(empty($mime)) $mime = $this->mime;
 		switch($this->mime) {
 			case 'image/jpeg':
 				$extension = "jpg";
@@ -102,8 +97,25 @@ class flyImage {
 				break;
 			default:
 				$this->aErrors[] = "3: Unsupported image type";
-				return $filename;	
+				return false;	
 		}
+		return $extension;
+	}
+	
+	
+	/**
+	 * Replaces filename extension with new extension, according to detected $this->type.
+	 * Adds extension, if not present.
+	 * @param $filename
+	 * @return string
+	 */
+	function extension_detect($filename =''){
+		if(empty($filename)) {
+			$filename = $this->filename;
+		}
+		$extension = $this->get_ext_from_mime();
+		if(!$extension)
+			return $filename;
 		$aPathInfo = pathinfo($filename);
 		$filename = $aPathInfo['dirname']."/".$aPathInfo['filename'].".".$extension;
 		return $filename;
@@ -122,7 +134,7 @@ class flyImage {
 	
 
 	/**
-	 * Saves picture with a filename specified in $filename.
+	 * Saves picture from memory with a filename specified in $filename.
 	 * If no filename specified - original filename used.
 	 */
 	function save( $filename ='' , $jpgquality =null ) {
@@ -130,15 +142,15 @@ class flyImage {
 			$filename = $filename.$this->filename_save;
 		}
 		if(empty($jpgquality)){
-			$jpgquality = $this->jpgquality;
+			$jpgquality = $this->settings_jpg_quality;
 		}
-		if($this->extension_autodetect){
+		if($this->settings_extension_autodetect){
 			$filename = $this->extension_detect($filename);
 		}
-		if($this->duplicate_replace && is_file($filename)){
+		if($this->settings_duplicate_replace && is_file($filename)){
 			@unlink($filename);
 		}
-		if($this->duplicate_increment_suffix && is_file($filename)){
+		if($this->settings_duplicate_increment_suffix && is_file($filename)){
 			$filename = $this->duplicate_increment_suffix($filename);	
 		}
 		if(is_file($filename)){
@@ -173,9 +185,16 @@ class flyImage {
 	/**
 	 * Resize picture, loaded by load(), applying desired resize mode.
 	 * If $autosave is set to TRUE - automatically saves image after resize.
-	 * Warning! This erases original picture, be careful with this option.
+	 * Warning! This erases original picture, be careful with this option (off by default).
+	 * Resize methods:
+	 *  RESIZE_MODE_STRICT	(default) width and height will be exactly as specified. Aspect ratio isn't kept.
+	 *  RESIZE_MODE_FIT		resize with keeping aspect ratio, by width or height, whichever would fit in specified borders
+	 *  RESIZE_MODE_WIDTH	resize by width (height ignored)
+	 *  RESIZE_MODE_HEIGHT	resize by height
+	 *  RESIZE_MODE_CLIP	completely fit in specified borders but crop outside inage data to keep aspect ratio
+	 *  RESIZE_MODE_BORDERS	completely fit image, adding borders to save original aspect ratio
 	 */
-	function resize($width, $height, $mode =RESIZE_MODE_STRICT, $autosave =0) {
+	function _resize($width, $height, $mode =RESIZE_MODE_STRICT, $autosave =0, $jpgquality =null) {
 		$width_orig  = imagesx($this->image_pixels);
 		$height_orig = imagesy($this->image_pixels);
 		switch ($mode) {
@@ -204,34 +223,65 @@ class flyImage {
 				$new_width  = round( $height*$ratio_orig );
 				break;
 			case RESIZE_MODE_CLIP:
+				$ratio_orig = $width_orig/$height_orig;
 				$ratio = $width/$height;
-				$new_width = $width;
-				$new_height = $height;
-				if($width/$ratio > $height_orig) {
-					$height_orig = round($width/$ratio);
+				if ($width/$height < $ratio_orig) {
+					$new_width = round( $height*$ratio_orig );
+					$width_orig = round( $height_orig*$ratio );					
 				} else {
-					$width_orig = round($height*$ratio);
+					$new_height = round( $width/$ratio_orig );
+					$height_orig = round( $width_orig/$ratio );
 				}
+				$new_height = $height;
+				$new_width	= $width;
 				break;
+			case RESIZE_MODE_BORDERS:
+				$ratio_orig = $width_orig/$height_orig;
+				if ($width/$height > $ratio_orig) {
+					$new_width = round( $height*$ratio_orig );
+					$new_height = $height;
+				} else {
+					$new_height = round( $width/$ratio_orig );
+					$new_width  = $width;
+				}
+				$image_p = imagecreatetruecolor($new_width, $new_height);
+				$image_o = $this->image_pixels;
+				imagecopyresampled($image_p, $image_o, 0, 0, 0, 0, $new_width, $new_height, $width_orig, $height_orig);
+				$this->image_pixels = $image_p;
+				$image_p = imagecreatetruecolor($width, $height);
+				$image_o = $this->image_pixels;
+				$bg_color =& $this->settings_resizeborders_color;
+				imagefill($image_p, 0, 0, imagecolorallocate($image_p, hexdec(substr($bg_color,1,2)), hexdec(substr($bg_color,3,2)), hexdec(substr($bg_color,5,2))) );
+				$this->image_pixels = $image_p;
+				imagecopy($image_p, $image_o, round(($width-$new_width)/2), round(($height-$new_height)/2), 0, 0, $new_width, $new_height);
+				$this->image_pixels = $image_p;
+				$new_width  =$width_orig;
+				$new_height =$height_orig;
+				break;	
 		}
-		$this->image_pixels_backup = $this->image_pixels;
-		$image_p = imagecreatetruecolor($new_width, $new_height);
-		$image_o = $this->image_pixels;
-		imagecopyresampled($image_p, $image_o, 0, 0, 0, 0, $new_width, $new_height, $width_orig, $height_orig);
-		$this->image_pixels = $image_p;
+		if($this->settings_undo){
+			$this->image_pixels_backup = $this->image_pixels;
+		}
+		if($new_width!=$width_orig && $new_height!=$height_orig) {	
+			$image_p = imagecreatetruecolor($new_width, $new_height);
+			$image_o = $this->image_pixels;
+			imagecopyresampled($image_p, $image_o, 0, 0, 0, 0, $new_width, $new_height, $width_orig, $height_orig);
+			$this->image_pixels = $image_p;
+		}	
 		if($autosave){
-			unlink($this->filename);
-			$this->save($this->filename);
+			$savename = ($autosave===1 || $autosave===true) ? $this->filename : $autosave;
+			if($savename==$this->filename && is_file($savename)) unlink($this->filename);
+			return $this->save($savename, $jpgquality);
 		}
 	}
-
-
+	
+	
 	/**
 	 * Does the same as resize(), but prevents enlarging picture more
 	 * than original resolution
 	 */
 	//TODO: recalc image downsample formulas
-	function downsample($width, $height, $mode =RESIZE_MODE_STRICT, $autosave =0){
+	function _downsample($width, $height, $mode =RESIZE_MODE_STRICT, $autosave =0, $jpgquality =null){
 		$width_orig  = imagesx($this->image_pixels);
 		$height_orig = imagesy($this->image_pixels);
 		$ratio_orig = $width_orig/$height_orig;
@@ -293,13 +343,37 @@ class flyImage {
 					$new_height= $height_orig;
 				} 
 				break;
+			case RESIZE_MODE_BORDERS:
+				$new_width = $width;
+				$new_height = $height;
+				break;	
 		}
-		return $this->resize($width, $height, $mode, $autosave);
+		return $this->resize($width, $height, $mode, $autosave, $jpgquality);
 	}
 
+	
+	/**
+	 * Load file and resize it.
+	 */
+	function resize($filename, $width, $height, $mode =RESIZE_MODE_STRICT, $autosave =0, $jpgquality =null){
+		if(!$this->load($filename))	return false;
+		return $this->_resize($width, $height, $mode, $autosave, $jpgquality);
+	}
+	
+	
+	/**
+	 * Load file and resize, but prevent enlarging.
+	 */
+	function downsample($filename, $width, $height, $mode =RESIZE_MODE_STRICT, $autosave =0, $jpgquality =null){
+		if(!$this->load($filename))	return false;
+		return $this->_downsample($width, $height, $mode, $autosave, $jpgquality);
+	}
+	
 
-	function revert(){
+	function &revert(){
+		if(!$this->settings_undo) return false;
 		$this->image_pixels = $this->image_pixels_backup;
+		return $this;
 	}
 
 }
