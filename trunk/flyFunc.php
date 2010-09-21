@@ -185,7 +185,7 @@ class func {
 
 	/*
 	 * @string $folder
-	 * @string $filter - condition in format "(FILE != smth)", where FILE is a placeholder for each entry
+	 * @string $filter - condition in format "FILE != smth", where FILE is a placeholder for each entry. PHP eval() is used to handle this condition.
 	 * @return mixed
 	 */
 	function files_list($folder, $filter ="") {
@@ -200,7 +200,7 @@ class func {
 		while ( $entry = $dir->read() ) {
 			$iFilter = str_replace("FILE", $entry, $filter);
 			//echo("Entry: $entry;  Filter: $iFilter; <br>");
-			if(($entry!='.') AND ($entry != '..') AND (assert($iFilter))) {
+			if(($entry!='.') AND ($entry != '..') AND (eval("return (bool)(".$iFilter.");"))) {
 				$res[] = $entry;
 			}
 		}
