@@ -72,10 +72,9 @@ class flyCrawler{
 		while($line = fgets($this->socket_link) )
 			$response .= $line;
 		fclose($this->socket_link);	
-		$aResponse = explode("\r\n\r\n", $response);
-		$this->last_response_headers = $aResponse[0];
-		$this->last_response = $aResponse[1];
-		return $aResponse[1];
+    $this->last_response_headers = substr($response, 0 , strpos($response, "\r\n\r\n") );
+    $this->last_response = substr($response, strpos($response, "\r\n\r\n") );
+    return $this->last_response;
 	}
 	
 	
