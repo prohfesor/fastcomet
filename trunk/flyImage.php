@@ -5,7 +5,8 @@ define('RESIZE_MODE_FIT', 1);
 define('RESIZE_MODE_WIDTH', 2);
 define('RESIZE_MODE_HEIGHT', 3);
 define('RESIZE_MODE_CLIP', 4);
-define('RESIZE_MODE_BORDERS', 5);
+define('RESIZE_MODE_CLIP_CENTER', 5);
+define('RESIZE_MODE_BORDERS', 6);
 
 class flyImage {
 
@@ -41,8 +42,8 @@ class flyImage {
 	 * @return bool
 	 */
 	function load( $filename ) {
-		if(!is_file($filename)) {
-			$this->aErrors[] = "1: File not exists";
+		if(!is_readable($filename)) {
+			$this->aErrors[] = "1: Can't read file from source";
 			return false;
 		}
 
@@ -83,6 +84,7 @@ class flyImage {
 	function get_ext_from_mime($mime =null){
 		if(empty($mime)) $mime = $this->mime;
 		switch($this->mime) {
+			case 'image/jpg':
 			case 'image/jpeg':
 				$extension = "jpg";
 				break;
@@ -192,11 +194,14 @@ class flyImage {
 	 *  RESIZE_MODE_WIDTH	resize by width (height ignored)
 	 *  RESIZE_MODE_HEIGHT	resize by height
 	 *  RESIZE_MODE_CLIP	completely fit in specified borders but crop outside inage data to keep aspect ratio
+	 *  RESIZE_MODE_CLIP_CENTER	same, but align crop to center
 	 *  RESIZE_MODE_BORDERS	completely fit image, adding borders to save original aspect ratio
 	 */
 	function _resize($width, $height, $mode =RESIZE_MODE_STRICT, $autosave =0, $jpgquality =null) {
 		$width_orig  = imagesx($this->image_pixels);
 		$height_orig = imagesy($this->image_pixels);
+		$left = 0;
+		$top = 0;
 		switch ($mode) {
 			case RESIZE_MODE_STRICT:
 				$new_width = $width;
@@ -235,6 +240,23 @@ class flyImage {
 				$new_height = $height;
 				$new_width	= $width;
 				break;
+			case RESIZE_MODE_CLIP_CENTER:
+				$ratio_orig = $width_orig/$height_orig;
+				$ratio = $width/$height;
+				if ($width/$height < $ratio_orig) {
+					$left = $width_orig - round( $height_orig*$ratio );
+					$left = round($left/2);
+					$new_width = round( $height*$ratio_orig );
+					$width_orig = round( $height_orig*$ratio );
+				} else {
+					$top = $height_orig - round( $width_orig/$ratio );
+					$top = round($top/2);
+					$new_height = round( $width/$ratio_orig );
+					$height_orig = round( $width_orig/$ratio );
+				}
+				$new_height = $height;
+				$new_width	= $width;
+				break;
 			case RESIZE_MODE_BORDERS:
 				$ratio_orig = $width_orig/$height_orig;
 				if ($width/$height > $ratio_orig) {
@@ -264,8 +286,8 @@ class flyImage {
 		}
 		if($new_width!=$width_orig && $new_height!=$height_orig) {	
 			$image_p = imagecreatetruecolor($new_width, $new_height);
-			$image_o = $this->image_pixels;
-			imagecopyresampled($image_p, $image_o, 0, 0, 0, 0, $new_width, $new_height, $width_orig, $height_orig);
+			$image_o =& $this->image_pixels;
+			imagecopyresampled($image_p, $image_o, 0, 0, $left, $top, $new_width, $new_height, $width_orig, $height_orig);
 			$this->image_pixels = $image_p;
 		}	
 		if($autosave){
@@ -280,7 +302,7 @@ class flyImage {
 	 * Does the same as resize(), but prevents enlarging picture more
 	 * than original resolution
 	 */
-	//TODO: recalc image downsample formulas
+	//@TODO: recalc image downsample formulas
 	function _downsample($width, $height, $mode =RESIZE_MODE_STRICT, $autosave =0, $jpgquality =null){
 		$width_orig  = imagesx($this->image_pixels);
 		$height_orig = imagesy($this->image_pixels);
