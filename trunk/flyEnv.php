@@ -1,7 +1,7 @@
 <?php
 
 
- class flyEnvironment {
+ class flyEnv {
 
 
 	/*
