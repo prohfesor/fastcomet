@@ -54,6 +54,7 @@
 			break;
 		  case(FLY_REQUEST_SERVER):
 		  	$aRequest =& $_SERVER;
+            break;
 		  default:
 			 return false;
 		}
@@ -194,8 +195,7 @@
 				return false;
 			}
 		}
-		return false;
-		//padonki... ;)
+		//return false;
 	}
 
 
@@ -216,7 +216,7 @@
 	function &getInstance() {
 		global $instance;
 		if ($instance === null) {
-			$instance = new flyEnvironment("EnvironmentPass");
+			$instance = new flyEnv("EnvironmentPass");
 		}
 
 		return $instance;
