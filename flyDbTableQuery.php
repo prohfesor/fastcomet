@@ -88,6 +88,7 @@ class flyDbTableQuery extends flyDb {
 			$where .= "(" . implode( ") AND(" , $this->aFilters ) . ")";
 		}
 		//limits
+        $limits = '';
 		if(!empty($this->aLimits[0]) || !empty($this->aLimits[1])) {
 			$limits  = "LIMIT ";
 			$limits .= (!empty($this->aLimits[0])) ? (int)$this->aLimits[0] : "0";
@@ -172,15 +173,15 @@ class flyDbTableQuery extends flyDb {
 		}
 		return $this->db->fetch_value($query, 'flydbtablequery_numrows');
 	}
-	
-	
-	function getObjects() {
-		$query = $this->_createQuery();
-		$aResult = $this->db->fetch_all_rows($query);
-		if($this->count_rows)
-		 $this->rows_total = $this->rowsCount();
-		return $aResult;
-	}
+
+
+    function getObjects($return_array =false) {
+        $query = $this->_createQuery();
+        $aResult = $this->db->fetch_all_rows($query, $return_array);
+        if($this->count_rows)
+            $this->rows_total = $this->rowsCount();
+        return $aResult;
+    }
 	
 	
 	function getFirst($return_array =0) {
