@@ -37,9 +37,9 @@
 	}
 
 
-	function & getInstance(){
-		//not used?
-	}
+//	static function getInstance(){
+//		//not used?
+//	}
 
 
 	/**

@@ -153,8 +153,8 @@ define("ERROR_DIE", 4);
     }
 
 
-	 function outHTML($message, $title ="ERROR") {
-		$settings =& flyErrorSettings::getInstance();
+	 static function outHTML($message, $title ="ERROR") {
+		$settings = flyErrorSettings::getInstance();
 		$D = rand(100,500);
 		$pre = str_replace( array("errD","%ERROR%") , array("err$D",$title) , $settings->pre_errmsg);
 
@@ -170,7 +170,7 @@ define("ERROR_DIE", 4);
 	}
 
 
-    function setErrorHandling($handlingMode)  {
+    static function setErrorHandling($handlingMode)  {
         $settings =& flyErrorSettings::getInstance();
         $settings->handlingMode = $handlingMode;
 
@@ -215,7 +215,7 @@ class flyErrorSettings {
      * @return flyErrorSettings
      * @access private
      */
-    function &getInstance()
+    static function getInstance()
     {
         static $instance;
         if ($instance === null) {
