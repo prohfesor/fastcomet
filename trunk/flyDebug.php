@@ -11,7 +11,7 @@ define ("DEBUG_TRIGGER_ERROR", 4);
 	var $failedMessage  ="";
 
 	
-    function assert($condition, $err_message ="") {
+    static function assert($condition, $err_message ="") {
         if (!is_bool($condition)) {
         	$message = "Condition must only have boolean result.";
             trigger_error("flyDebug::assert(): $message (<code>$condition</code>)", E_USER_ERROR);
@@ -23,7 +23,7 @@ define ("DEBUG_TRIGGER_ERROR", 4);
         }
 
         if (!$condition) {
-        	$debug =& flyDebug::getInstance();
+        	$debug = flyDebug::getInstance();
         	$debug->failedMessage = $err_message;
             flyDebug::notifyAssertion($callingPlace[0], $callingPlace[1], "");
         }
@@ -32,7 +32,7 @@ define ("DEBUG_TRIGGER_ERROR", 4);
 
     function notifyAssertion($file, $line, $code)
     {
-        $debug =& flyDebug::getInstance();
+        $debug = flyDebug::getInstance();
 
         switch ($debug->assertReaction) {
             case DEBUG_IGNORE:
@@ -51,8 +51,8 @@ define ("DEBUG_TRIGGER_ERROR", 4);
 
 
 
-    function dump($value, $caption = "", $escape = true, $return = false) {
-    	$debug =& flyDebug::getInstance();
+    static function dump($value, $caption = "", $escape = true, $return = false) {
+    	$debug = flyDebug::getInstance();
         ob_start();
          print_r($value);
         $content = ob_get_contents();
@@ -72,7 +72,7 @@ define ("DEBUG_TRIGGER_ERROR", 4);
     }
 
 
-    function getCallingPlace($returnArray = false)
+    static function getCallingPlace($returnArray = false)
     {
         if (!$returnArray) {
             $result = "";
@@ -103,22 +103,22 @@ define ("DEBUG_TRIGGER_ERROR", 4);
 	 *
 	 * Warning: this will exhaust allowed memory very easily, so adjust tick counter according to the size of your code.  Also, array_key_exists checking on debug_backtrace arrays is removed here only to keep this example simple, but should be added to avoid a large number of resulting PHP Notice errors.
 	 * code from php.net
-	 * @param int ticks
+	 * @param $ticks integer
      */
-    function benchmark($ticks =1){
-    	$debug = flyDebug::GetInstance();
+    static function benchmark($ticks =1){
+    	$debug = flyDebug::getInstance();
 		$debug->script_stats = array();
 		$debug->script_time = microtime(true);
 
 		function track_stats(){
-			$debug = flyDebug::GetInstance();
+			$debug = flyDebug::getInstance();
 		    $trace = debug_backtrace();
 		    $exe_time = (microtime(true) - $debug->script_time) * 1000;
 		    foreach($trace[1]["args"] as $k=>$arg){
 		    	if('string'==gettype($arg) && 60<=strlen($arg))
 		    		$trace[1]["args"][$k] = substr($arg,0,45) . '...' . substr($arg,-15);
 		    }
-		    $func_args = implode(", ",$trace[1]["args"]);
+		    $func_args = @implode(", ",$trace[1]["args"]);
 		    $stat = array(
 		        "current_time" => date("H:i:") . ((microtime(true)-time())+(int)date("s")),
 		        "memory" => memory_get_usage(true),
@@ -138,7 +138,7 @@ define ("DEBUG_TRIGGER_ERROR", 4);
 
 		//TODO: add tmp dir detection
 		$temp_file = ini_get('upload_tmp_dir').'/flydebug_ticks.php';
-    	file_put_contents($temp_file,"<? declare(ticks=$ticks) ?>");
+    	file_put_contents($temp_file,"<?php declare(ticks=$ticks) ?>");
     	require_once($temp_file);
     	unlink($temp_file);
 		
@@ -147,7 +147,7 @@ define ("DEBUG_TRIGGER_ERROR", 4);
     }
 
 
-    function &getInstance() {
+    static function getInstance() {
         static $instance = null;
 
         if ($instance === null) {

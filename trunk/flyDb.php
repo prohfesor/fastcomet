@@ -40,7 +40,7 @@
      * @return flyDb
      * @static
      */
-    function & getInstance($connectionName =null, $dbDriver ="Mysql")
+    static function getInstance($connectionName =null, $dbDriver ="Mysql")
     {
         if ($connectionName === null) {
             $connectionName = "";
