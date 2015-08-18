@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Class is the set of static functions.
+ * Helper set of static functions.
  * General purpose functions to increase usability.
  * Usage: func::function_name($param)
  */
