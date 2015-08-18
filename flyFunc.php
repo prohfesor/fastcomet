@@ -1,6 +1,6 @@
 <?php
 
-/*
+/**
  * Class is the set of static functions.
  * General purpose functions to increase usability.
  * Usage: func::function_name($param)
@@ -9,47 +9,6 @@
 class flyFunc {
 
 
-	//---------------------------------------------------------//
-	// This function is php5 file_put_contents copy            //
-	//---------------------------------------------------------//
-	/**
-	 *  Function opens file $file for write, writes $text into it
-	 *  and closes it.
-	 *  Uses 'lock' file to protect files from multiple writing.
-	 *  Copyright by relaodcms
-	 */
-	function file_write_contents($file, $text, $mode = 'w+') {
-		if(!is_dir(dirname($file))){
-			new flyError('Directory not found: ' . dirname($file));
-			return false;
-		}
-		while(is_file($file . '.lock') && !@IGNORE_LOCK_FILES){
-			//Wait for lock to release
-		}
-		$fp = fopen($file . '.lock', 'w+'); fwrite($fp, 'lock'); fclose($fp);
-		if($fp = fopen($file, $mode)) {
-			if(!empty($text) && !fwrite($fp, $text)) return false;
-			fclose($fp);
-		} else return false;
-		unlink($file . '.lock');
-		return true;
-	}
-
-
-	//---------------------------------------------------------//
-	// This function is created for compatibility              //
-	//---------------------------------------------------------//
-	/*
-	if(!function_exists('file_get_contents')){
-		function file_get_contents($file) {
-			if(!$file = file($file)) return false;
-			if(!$file = implode('', $file)) return false;
-			return $file;
-		}
-	}
-	*/
-
-	
 	/**
 	 * Write file archived in gzip.
 	 * Function similar to func::file_write_contents
