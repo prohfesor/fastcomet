@@ -1,67 +1,79 @@
 <?php
-/*
- * Created on 16.07.2008
- *
- * Author: Pavel Dvoynos (prohfesor@gmail.com)
- * FlyToolkit framework
- *
- *
+
+/**
+ * Class flyDb
+ * Parent class for different db driver implementations
  */
 
- require_once('flyDbMysql.php');
- require_once('flySqlUtil.php');
- require_once('flyDebug.php');
+ abstract class flyDb {
 
- class flyDb {
+     /**
+      * Execute database query.
+      * Useful for queries returning no data.
+      * Returns number of affected rows on success, or False on error
+      * @param $query db query
+      * @return mixed
+      */
+    abstract public function exec($query);
 
-    /**
-     * @access private
-     */
-    function flyDb($secret = null)
-    {
-		if ($secret != "singletonpass") {
-            return new flyError("Unable to call private constructor of Singleton class. Use &getInstance() call instead!");
-        }
+     /**
+      * Alias for exec()
+      * @param $query db query
+      * @return mixed
+      */
+    public function sql($query) {
+        return $this->exec($query);
     }
 
+     /**
+      * Execute database query,
+      * Useful for "insert" queries.
+      * Returns last autoincrement id, 0 if nothing inserted, or False on error
+      * @param $query db query
+      * @return mixed
+      */
+    abstract public function insert($query);
 
-	/**
-     * Get instance of Singleton class.
-     *
-     * Returns link to DbConnection.
-     * Supports multiple connections, but only one can be used at a time.
-     * Therefore, connection is keeping active.
-     * If no DbDriver specified - MySql used by default.
-     * If you are using single DB connection at runtime - empty $connectionName
-     * allowed, which is equal to "" connection.
-     * Class for db driver must be named as "flyDb{Dbdriver}.php".
-     *
-     * @access public
-     * @return flyDb
-     * @static
-     */
-    static function getInstance($connectionName =null, $dbDriver ="Mysql")
-    {
-        if ($connectionName === null) {
-            $connectionName = "";
-        }
+     /**
+      * Returns array of all results
+      * @param $query db query
+      * @return mixed
+      */
+    abstract public function fetchAll($query);
 
-        $dbDriver = ucfirst(strtolower($dbDriver));
+     /**
+      * Returns first row in results set
+      * @param $query db query
+      * @return mixed
+      */
+    abstract public function fetchOne($query);
 
-        static $aInstances =array();
-
-        if (!isset($aInstances[$connectionName])) {
-            $className = "flyDb$dbDriver";
-            flyDebug::assert(class_exists($className));
-
-        	$aInstances[$connectionName] = new $className("fly".$dbDriver."pass");
-        }
-
-        return $aInstances[$connectionName];
+     /**
+      * @param $query db query
+      * @return mixed
+      */
+    public function fetchRow($query) {
+        return $this->fetchOne($query);
     }
 
+     /**
+      * Returns array of one column of results set.
+      * If $columnName not specified - take first column
+      * @param $query
+      * @param $columnName
+      * @return mixed
+      */
+    abstract public function fetchColumn($query, $columnName =false);
+
+     /**
+      * Returns key-value array with keys from $keyColumn column and values from $valueColumn.
+      * If no $keyColumn - take first column
+      * IF no $valueColumn - take next column after $keyColumn
+      * @param $query
+      * @param $keyColumn
+      * @param $valueColumn
+      * @return mixed
+      */
+    abstract public function fetchKeyValue($query, $keyColumn =false, $valueColumn =false);
 
 }
-
-
-?>
