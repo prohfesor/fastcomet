@@ -49,6 +49,7 @@
     abstract public function fetchOne($query);
 
      /**
+      * Alias for fetchOne()
       * @param $query db query
       * @return mixed
       */
