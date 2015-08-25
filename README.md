@@ -11,8 +11,8 @@ NOT RECCOMMENDED TO USE TILL BE STABLE
  - [ ] Modules with dependencies and composer
   - [ ] Error handler module 
   - [ ] Database handy module
-  - [ ] Application with dependency injection
   - [ ] Event manager for easy hooking
+  - [ ] Application with dependency injection
  - [ ] 100% unit tested
  - [ ] 100% documentation on the web
  - [ ] getting started and examples in docs
