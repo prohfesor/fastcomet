@@ -16,8 +16,10 @@ class flyDbPdo extends flyDb
 
     private $lastInsertId;
     private $lastAffectedRows;
+    private $hasError =false;
+    private $error;
 
-    public function __construct($pdoDsn, $user, $pass, $options =array()) {
+    public function __construct($pdoDsn, $user ='', $pass ='', $options =array()) {
         $this->pdo = new PDO($pdoDsn, $user, $pass, $options);
     }
 
@@ -26,7 +28,15 @@ class flyDbPdo extends flyDb
      */
     public function exec($query)
     {
-        // TODO: Implement exec() method.
+        $result = $this->pdo->exec($query);
+        if($result !== false){
+            $this->lastAffectedRows = $result;
+        } else {
+            $this->hasError = true;
+            $this->error = $this->pdo->errorInfo();
+        }
+
+        return $result;
     }
 
     /**
@@ -34,7 +44,8 @@ class flyDbPdo extends flyDb
      */
     public function insert($query)
     {
-        // TODO: Implement insert() method.
+        $this->lastInsertId = $this->pdo->exec($query);
+        return $this->lastInsertId;
     }
 
     /**
@@ -69,5 +80,21 @@ class flyDbPdo extends flyDb
         // TODO: Implement fetchKeyValue() method.
     }
 
+    public function getError() {
+        if(!$this->hasError){
+            return false;
+        }
+        $message = "";
+        if(!empty($this->error[0])){
+            $message .= "[{$this->error[0]}]";
+        }
+        if(!empty($this->error[1])){
+            $message .= "[{$this->error[1]}]";
+        }
+        if(!empty($this->error[2])){
+            $message .= " ". $this->error[2];
+        }
+        return $message;
+    }
 
 }
