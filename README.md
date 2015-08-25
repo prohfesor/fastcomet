@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/prohfesor/fastcomet.svg?branch=master)](https://travis-ci.org/prohfesor/fastcomet)
 # fastcomet
 Automatically exported from code.google.com/p/fastcomet
 
