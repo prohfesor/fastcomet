@@ -61,8 +61,12 @@ class flyDbPdoTest extends PHPUnit_Extensions_Database_TestCase
         $this->assertNotFalse($result);
 
         $result = $this->db->exec("CREATE TABLE {$table} (id INT, name VARCHAR(20))");
-
         $this->assertNotFalse($result);
+        $this->assertEquals(0, $this->getConnection()->getRowCount($table));
+
+        $this->db->setConfigThrowException(false);
+        $result = $this->db->exec("DROP TABLE {$table}Wrong (id INT, wrong_name VARCHAR(20))");
+        $this->assertFalse($result);
         $this->assertEquals(0, $this->getConnection()->getRowCount($table));
     }
 
@@ -76,9 +80,39 @@ class flyDbPdoTest extends PHPUnit_Extensions_Database_TestCase
         $this->assertEquals(1, $this->getConnection()->getRowCount($table));
         $this->assertEquals(false, $this->db->getError());
 
-        $result = $this->db->exec("INSERT INTO {$table} VALUES ('RRR', 'OOO', 'AAA', 'RRR')");
+        $result = $this->db->insert("INSERT INTO {$table} VALUES (1, 'efgh')");
+
+        $this->assertEquals(2, $result);
+        $this->assertEquals(2, $this->getConnection()->getRowCount($table));
+        $this->assertEquals(false, $this->db->getError());
+
+        $this->db->setConfigThrowException(false);
+        $result = $this->db->insert("INSERT INTO {$table} VALUES ('RRR', 'OOO', 'AAA', 'RRR')");
         $this->assertFalse($result);
         $this->assertNotFalse( $this->db->getError() );
+    }
+
+
+    public function testFetchAll() {
+        $table = "testFetchAll";
+
+        $result = $this->db->exec("DROP TABLE IF EXISTS {$table}");
+        $this->assertNotFalse($result);
+
+        $result = $this->db->exec("CREATE TABLE {$table} (id INT, title VARCHAR(30), number DECIMAL(10) )");
+        $this->assertNotFalse($result);
+
+        $rows = rand(10,49);
+        for($i=1;$i<=$rows;$i++){
+            $title = flyFunc::generate_string();
+            $number = flyFunc::generate_string( rand(5,10), "0123456789");
+            $result = $this->db->insert("INSERT INTO {$table} (title, number) VALUES ('{$title}', '{$number}')");
+            $this->assertGreaterThan(0, $result);
+        }
+
+        $result = $this->db->fetchAll("SELECT * FROM {$table}");
+        $this->assertNotFalse($result);
+        $this->assertEquals($rows, sizeof($result));
     }
 
 

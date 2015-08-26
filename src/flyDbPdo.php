@@ -19,6 +19,9 @@ class flyDbPdo extends flyDb
     private $hasError =false;
     private $error;
 
+    private $configThrowException =true;
+
+
     public function __construct($pdoDsn, $user ='', $pass ='', $options =array()) {
         $this->pdo = new PDO($pdoDsn, $user, $pass, $options);
     }
@@ -32,8 +35,8 @@ class flyDbPdo extends flyDb
         if($result !== false){
             $this->lastAffectedRows = $result;
         } else {
-            $this->hasError = true;
-            $this->error = $this->pdo->errorInfo();
+            $this->error();
+            return false;
         }
 
         return $result;
@@ -44,7 +47,13 @@ class flyDbPdo extends flyDb
      */
     public function insert($query)
     {
-        $this->lastInsertId = $this->pdo->exec($query);
+        $result = $this->pdo->exec($query);
+        if($result !== false){
+            $this->lastInsertId = $this->pdo->lastInsertId();
+        } else {
+            $this->error();
+            return false;
+        }
         return $this->lastInsertId;
     }
 
@@ -53,7 +62,14 @@ class flyDbPdo extends flyDb
      */
     public function fetchAll($query)
     {
-        // TODO: Implement fetchAll() method.
+        $st = $this->pdo->prepare($query);
+        $result = $st->execute();
+        if($result === false){
+            $this->error();
+            return false;
+        }
+        $rows = $st->fetchAll(PDO::FETCH_ASSOC);
+        return $rows;
     }
 
     /**
@@ -80,6 +96,16 @@ class flyDbPdo extends flyDb
         // TODO: Implement fetchKeyValue() method.
     }
 
+    private function error(){
+        $this->hasError = true;
+        $this->error = $this->pdo->errorInfo();
+
+        if($this->configThrowException){
+            throw new Exception($this->getError());
+        }
+        return true;
+    }
+
     public function getError() {
         if(!$this->hasError){
             return false;
@@ -96,5 +122,39 @@ class flyDbPdo extends flyDb
         }
         return $message;
     }
+
+
+    /**
+     * @return boolean
+     */
+    public function getConfigThrowException()
+    {
+        return $this->configThrowException;
+    }
+
+    /**
+     * @param boolean $configThrowException
+     */
+    public function setConfigThrowException($configThrowException)
+    {
+        $this->configThrowException = $configThrowException;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLastAffectedRows()
+    {
+        return $this->lastAffectedRows;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLastInsertId()
+    {
+        return $this->lastInsertId;
+    }
+
 
 }
