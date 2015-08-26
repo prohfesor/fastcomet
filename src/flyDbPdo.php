@@ -35,8 +35,7 @@ class flyDbPdo extends flyDb
         if($result !== false){
             $this->lastAffectedRows = $result;
         } else {
-            $this->error();
-            return false;
+            return $this->error();
         }
 
         return $result;
@@ -51,8 +50,7 @@ class flyDbPdo extends flyDb
         if($result !== false){
             $this->lastInsertId = $this->pdo->lastInsertId();
         } else {
-            $this->error();
-            return false;
+            return $this->error();
         }
         return $this->lastInsertId;
     }
@@ -63,10 +61,11 @@ class flyDbPdo extends flyDb
     public function fetchAll($query)
     {
         $st = $this->pdo->prepare($query);
-        $result = $st->execute();
-        if($result === false){
-            $this->error();
-            return false;
+        if($st) {
+            $result = $st->execute();
+        }
+        if($st === false || $result === false){
+            return $this->error();
         }
         $rows = $st->fetchAll(PDO::FETCH_ASSOC);
         return $rows;
@@ -96,6 +95,12 @@ class flyDbPdo extends flyDb
         // TODO: Implement fetchKeyValue() method.
     }
 
+    /**
+     * Get error message from pdo and set error flag.
+     * Always returns false.
+     * @return bool
+     * @throws Exception
+     */
     private function error(){
         $this->hasError = true;
         $this->error = $this->pdo->errorInfo();
@@ -103,9 +108,15 @@ class flyDbPdo extends flyDb
         if($this->configThrowException){
             throw new Exception($this->getError());
         }
-        return true;
+
+        return false;
     }
 
+    /**
+     * Get error message.
+     * Returns false if no error.
+     * @return bool|string
+     */
     public function getError() {
         if(!$this->hasError){
             return false;

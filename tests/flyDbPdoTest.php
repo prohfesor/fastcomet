@@ -99,7 +99,7 @@ class flyDbPdoTest extends PHPUnit_Extensions_Database_TestCase
         $result = $this->db->exec("DROP TABLE IF EXISTS {$table}");
         $this->assertNotFalse($result);
 
-        $result = $this->db->exec("CREATE TABLE {$table} (id INT, title VARCHAR(30), number DECIMAL(10) )");
+        $result = $this->db->exec("CREATE TABLE {$table} (id INT, title VARCHAR(30), number DECIMAL(10), PRIMARY KEY (id))");
         $this->assertNotFalse($result);
 
         $rows = rand(10,49);
@@ -113,6 +113,10 @@ class flyDbPdoTest extends PHPUnit_Extensions_Database_TestCase
         $result = $this->db->fetchAll("SELECT * FROM {$table}");
         $this->assertNotFalse($result);
         $this->assertEquals($rows, sizeof($result));
+
+        $this->db->setConfigThrowException(false);
+        $result = $this->db->fetchAll("SELECT name, phone FROM {$table}");
+        $this->assertFalse($result);
     }
 
 
