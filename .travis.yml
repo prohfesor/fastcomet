@@ -3,11 +3,13 @@ php:
   - 5.4
   - 5.5
   - 5.6
-  - hhvm
   - 7.0
+#  - hhvm
+# hhvm php machine didn't want to download another phpunit.phar, so we disabling it till they upgrade their phpunit
 
 before_script:
   - cd ./tests/
+# travis uses older phpunit build which don't support  $this->createArrayDataSet(array()), so we force download of latest stable
   - wget https://phar.phpunit.de/phpunit.phar --no-check-certificate
 
 script:
