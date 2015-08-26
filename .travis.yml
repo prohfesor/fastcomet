@@ -8,7 +8,7 @@ php:
 
 before_script:
   - cd ./tests/
-  - wget https://phar.phpunit.de/phpunit.phar --no-check-certificates
+  - wget https://phar.phpunit.de/phpunit.phar --no-check-certificate
 
 script:
   php phpunit.phar ./ --coverage-text
