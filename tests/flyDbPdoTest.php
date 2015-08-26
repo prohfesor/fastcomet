@@ -19,6 +19,7 @@ class flyDbPdoTest extends PHPUnit_Extensions_Database_TestCase
 
     private $dbFilename = null;
 
+
     public function getConnection()
     {
         $pdoDsn = 'sqlite:'.$this->getDbFilename();
@@ -27,10 +28,12 @@ class flyDbPdoTest extends PHPUnit_Extensions_Database_TestCase
         return $this->createDefaultDBConnection($pdo);
     }
 
+
     public function getDataset() {
         $ds = $this->createArrayDataSet(array());
         return $ds;
     }
+
 
     public function getDbFilename() {
         if($this->dbFilename === null) {
@@ -40,8 +43,8 @@ class flyDbPdoTest extends PHPUnit_Extensions_Database_TestCase
         return $this->dbFilename;
     }
 
-    public function __destruct() {
 
+    public function __destruct() {
         $this->db = null;
 
         if(is_file($this->dbfile)){
@@ -74,6 +77,7 @@ class flyDbPdoTest extends PHPUnit_Extensions_Database_TestCase
     public function testInsert() {
         $table = "testTbl";
 
+        //number of inserted row ok
         $result = $this->db->insert("INSERT INTO {$table} VALUES (1, 'abcd')");
 
         $this->assertEquals(1, $result);
@@ -86,6 +90,7 @@ class flyDbPdoTest extends PHPUnit_Extensions_Database_TestCase
         $this->assertEquals(2, $this->getConnection()->getRowCount($table));
         $this->assertEquals(false, $this->db->getError());
 
+        //wrong column count
         $this->db->setConfigThrowException(false);
         $result = $this->db->insert("INSERT INTO {$table} VALUES ('RRR', 'OOO', 'AAA', 'RRR')");
         $this->assertFalse($result);
@@ -99,9 +104,10 @@ class flyDbPdoTest extends PHPUnit_Extensions_Database_TestCase
         $result = $this->db->exec("DROP TABLE IF EXISTS {$table}");
         $this->assertNotFalse($result);
 
-        $result = $this->db->exec("CREATE TABLE {$table} (id INT, title VARCHAR(30), number DECIMAL(10), PRIMARY KEY (id))");
+        $result = $this->db->exec("CREATE TABLE {$table} (id INTEGER PRIMARY KEY, title VARCHAR(30), number DECIMAL(10))");
         $this->assertNotFalse($result);
 
+        //each insert returns autoincrement
         $rows = rand(10,49);
         for($i=1;$i<=$rows;$i++){
             $title = flyFunc::generate_string();
@@ -110,12 +116,32 @@ class flyDbPdoTest extends PHPUnit_Extensions_Database_TestCase
             $this->assertGreaterThan(0, $result);
         }
 
+        //number of rows in result
         $result = $this->db->fetchAll("SELECT * FROM {$table}");
         $this->assertNotFalse($result);
         $this->assertEquals($rows, sizeof($result));
 
+        //wrong column
         $this->db->setConfigThrowException(false);
         $result = $this->db->fetchAll("SELECT name, phone FROM {$table}");
+        $this->assertFalse($result);
+    }
+
+
+    public function testFetchOne() {
+        $table = "testFetchAll";
+
+        $result = $this->db->fetchOne("SELECT * FROM {$table}");
+        $this->assertNotFalse($result);
+        $this->assertEquals( 3, sizeof($result));
+        $this->assertArrayHasKey('title', $result);
+        $this->assertArrayHasKey('number', $result);
+        $this->assertNotEmpty($result['title']);
+        $this->assertNotEmpty($result['number']);
+
+        //wrong column
+        $this->db->setConfigThrowException(false);
+        $result = $this->db->fetchOne("SELECT name, phone FROM {$table}");
         $this->assertFalse($result);
     }
 

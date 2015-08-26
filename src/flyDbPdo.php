@@ -76,7 +76,15 @@ class flyDbPdo extends flyDb
      */
     public function fetchOne($query)
     {
-        // TODO: Implement fetchOne() method.
+        $st = $this->pdo->prepare($query);
+        if($st) {
+            $result = $st->execute();
+        }
+        if($st === false || $result === false){
+            return $this->error();
+        }
+        $row = $st->fetch(PDO::FETCH_ASSOC);
+        return $row;
     }
 
     /**
