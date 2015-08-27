@@ -56,9 +56,7 @@ class flyDbPdoTest extends PHPUnit_Extensions_Database_TestCase
 
     public function testExec()
     {
-        $this->getConnection()->createDataSet();
-
-        $table = "testTbl";
+        $table = "testExec";
 
         $result = $this->db->exec("DROP TABLE IF EXISTS {$table}");
         $this->assertNotFalse($result);
@@ -70,7 +68,7 @@ class flyDbPdoTest extends PHPUnit_Extensions_Database_TestCase
 
 
     public function testInsert() {
-        $table = "testTbl";
+        $table = "testExec";
 
         //number of inserted row ok
         $result = $this->db->insert("INSERT INTO {$table} VALUES (1, 'abcd')");
@@ -169,6 +167,12 @@ class flyDbPdoTest extends PHPUnit_Extensions_Database_TestCase
         //wrong column
         $result = $this->db->fetchColumn("SELECT * FROM {$table}", "name");
         $this->assertFalse($result);
+
+        //throw exception
+        $this->db->setConfigThrowException(true);
+        $this->setExpectedException("Exception");
+        $this->db->fetchOne("SELECT name, phone FROM {$table}");
+        $this->db->insert("INSERT INTO {$table} VALUES ('RRR', 'OOO', 'AAA', 'RRR')");
     }
 
 
