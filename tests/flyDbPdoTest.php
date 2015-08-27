@@ -146,4 +146,20 @@ class flyDbPdoTest extends PHPUnit_Extensions_Database_TestCase
     }
 
 
+    public function testFetchColumn() {
+        $table = "testFetchAll";
+
+        $result = $this->db->fetchColumn("SELECT name FROM {$table} LIMIT 5");
+        $this->assertNotFalse($result);
+        $this->assertEquals(5, sizeof($result));
+        $this->assertEquals("array", gettype($result));
+        $this->assertEquals("string", gettype($result[1]));
+    }
+
+
+    public function testFetchKeyValue() {
+
+    }
+
+
 }

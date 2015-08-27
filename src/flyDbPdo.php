@@ -31,6 +31,7 @@ class flyDbPdo extends flyDb
      */
     public function exec($query)
     {
+        $this->errorReset();
         $result = $this->pdo->exec($query);
         if($result !== false){
             $this->lastAffectedRows = $result;
@@ -46,7 +47,7 @@ class flyDbPdo extends flyDb
      */
     public function insert($query)
     {
-        $result = $this->pdo->exec($query);
+        $result = $this->exec($query);
         if($result !== false){
             $this->lastInsertId = $this->pdo->lastInsertId();
         } else {
@@ -60,6 +61,7 @@ class flyDbPdo extends flyDb
      */
     public function fetchAll($query)
     {
+        $this->errorReset();
         $st = $this->pdo->prepare($query);
         if($st) {
             $result = $st->execute();
@@ -76,6 +78,7 @@ class flyDbPdo extends flyDb
      */
     public function fetchOne($query)
     {
+        $this->errorReset();
         $st = $this->pdo->prepare($query);
         if($st) {
             $result = $st->execute();
@@ -92,7 +95,10 @@ class flyDbPdo extends flyDb
      */
     public function fetchColumn($query, $columnName = false)
     {
-        // TODO: Implement fetchColumn() method.
+        $result = $this->fetchAll($query);
+        if($result === false){
+            return $this->error();
+        }
     }
 
     /**
@@ -118,6 +124,11 @@ class flyDbPdo extends flyDb
         }
 
         return false;
+    }
+
+    private function errorReset() {
+        $this->hasError = false;
+        $this->error = null;
     }
 
     /**
