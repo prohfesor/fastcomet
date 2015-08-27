@@ -99,6 +99,20 @@ class flyDbPdo extends flyDb
         if($result === false){
             return $this->error();
         }
+        $column = array();
+        if(!$columnName && isset($result[0])){
+            $keys = array_keys($result[0]);
+            $key = (isset($keys[0])) ? $keys[0]  :  false;
+        }
+        if(!$key) {
+            $this->hasError = true;
+            $this->error = array("","","Column not found!");
+            return $this->error();
+        }
+        foreach($result as $row){
+            $column[] = $row[$key];
+        }
+        return $column;
     }
 
     /**
@@ -111,6 +125,7 @@ class flyDbPdo extends flyDb
 
     /**
      * Get error message from pdo and set error flag.
+     * Throws exception unless $this->configThrowException is false
      * Always returns false.
      * @return bool
      * @throws Exception

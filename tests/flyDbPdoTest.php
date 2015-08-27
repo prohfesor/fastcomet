@@ -66,11 +66,6 @@ class flyDbPdoTest extends PHPUnit_Extensions_Database_TestCase
         $result = $this->db->exec("CREATE TABLE {$table} (id INT, name VARCHAR(20))");
         $this->assertNotFalse($result);
         $this->assertEquals(0, $this->getConnection()->getRowCount($table));
-
-        $this->db->setConfigThrowException(false);
-        $result = $this->db->exec("DROP TABLE {$table}Wrong (id INT, wrong_name VARCHAR(20))");
-        $this->assertFalse($result);
-        $this->assertEquals(0, $this->getConnection()->getRowCount($table));
     }
 
 
@@ -89,12 +84,6 @@ class flyDbPdoTest extends PHPUnit_Extensions_Database_TestCase
         $this->assertEquals(2, $result);
         $this->assertEquals(2, $this->getConnection()->getRowCount($table));
         $this->assertEquals(false, $this->db->getError());
-
-        //wrong column count
-        $this->db->setConfigThrowException(false);
-        $result = $this->db->insert("INSERT INTO {$table} VALUES ('RRR', 'OOO', 'AAA', 'RRR')");
-        $this->assertFalse($result);
-        $this->assertNotFalse( $this->db->getError() );
     }
 
 
@@ -120,11 +109,6 @@ class flyDbPdoTest extends PHPUnit_Extensions_Database_TestCase
         $result = $this->db->fetchAll("SELECT * FROM {$table}");
         $this->assertNotFalse($result);
         $this->assertEquals($rows, sizeof($result));
-
-        //wrong column
-        $this->db->setConfigThrowException(false);
-        $result = $this->db->fetchAll("SELECT name, phone FROM {$table}");
-        $this->assertFalse($result);
     }
 
 
@@ -138,18 +122,13 @@ class flyDbPdoTest extends PHPUnit_Extensions_Database_TestCase
         $this->assertArrayHasKey('number', $result);
         $this->assertNotEmpty($result['title']);
         $this->assertNotEmpty($result['number']);
-
-        //wrong column
-        $this->db->setConfigThrowException(false);
-        $result = $this->db->fetchOne("SELECT name, phone FROM {$table}");
-        $this->assertFalse($result);
     }
 
 
     public function testFetchColumn() {
         $table = "testFetchAll";
 
-        $result = $this->db->fetchColumn("SELECT name FROM {$table} LIMIT 5");
+        $result = $this->db->fetchColumn("SELECT title FROM {$table} LIMIT 5");
         $this->assertNotFalse($result);
         $this->assertEquals(5, sizeof($result));
         $this->assertEquals("array", gettype($result));
@@ -159,6 +138,37 @@ class flyDbPdoTest extends PHPUnit_Extensions_Database_TestCase
 
     public function testFetchKeyValue() {
 
+    }
+
+
+    public function testErrors() {
+        $table = "testFetchAll";
+        $this->db->setConfigThrowException(false);
+
+        //wrong table name
+        $result = $this->db->exec("DROP TABLE {$table}Wrong (id INT, wrong_name VARCHAR(20))");
+        $this->assertFalse($result);
+
+        //wrong column count
+        $result = $this->db->insert("INSERT INTO {$table} VALUES ('RRR', 'OOO', 'AAA', 'RRR')");
+        $this->assertFalse($result);
+        $this->assertNotFalse( $this->db->getError() );
+
+        //wrong column
+        $result = $this->db->fetchAll("SELECT name, phone FROM {$table}");
+        $this->assertFalse($result);
+
+        //wrong column
+        $result = $this->db->fetchOne("SELECT name, phone FROM {$table}");
+        $this->assertFalse($result);
+
+        //wrong column
+        $result = $this->db->fetchColumn("SELECT name, phone FROM {$table}");
+        $this->assertFalse($result);
+
+        //wrong column
+        $result = $this->db->fetchColumn("SELECT * FROM {$table}", "name");
+        $this->assertFalse($result);
     }
 
 
