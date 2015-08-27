@@ -102,15 +102,18 @@ class flyDbPdo extends flyDb
         $column = array();
         if(!$columnName && isset($result[0])){
             $keys = array_keys($result[0]);
-            $key = (isset($keys[0])) ? $keys[0]  :  false;
+            $columnName = (isset($keys[0])) ? $keys[0]  :  false;
         }
-        if(!$key) {
+        if($columnName && isset($result[0]) && !isset($result[0][$columnName])){
+            $columnName = false;
+        }
+        if(!$columnName) {
             $this->hasError = true;
             $this->error = array("","","Column not found!");
             return $this->error();
         }
         foreach($result as $row){
-            $column[] = $row[$key];
+            $column[] = $row[$columnName];
         }
         return $column;
     }
