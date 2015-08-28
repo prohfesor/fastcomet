@@ -123,7 +123,33 @@ class flyDbPdo extends flyDb
      */
     public function fetchKeyValue($query, $keyColumn = false, $valueColumn = false)
     {
-        // TODO: Implement fetchKeyValue() method.
+        $result = $this->fetchAll($query);
+        if($result === false) {
+            return $this->error();
+        }
+        $aKeyVakue = array();
+        if(!$keyColumn && isset($result[0])){
+            $keys = array_keys($result[0]);
+            $keyColumn =  $keys[0];
+        }
+        if(!$valueColumn && isset($result[0])){
+            $keys = array_keys($result[0]);
+            foreach($keys as $key){
+                if(isset($previous) && $previous==$keyColumn) {
+                    $valueColumn = $key;
+                }
+                $previous = $key;
+            }
+        }
+        if(!isset($keyColumn) || !isset($valueColumn)) {
+            $this->hasError = true;
+            $this->error = array("","","Column not found!");
+            return $this->error();
+        }
+        foreach($result as $row){
+            $aKeyVakue[ $row[$keyColumn] ] = $row[$valueColumn];
+        }
+        return $aKeyVakue;
     }
 
     /**
