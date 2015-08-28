@@ -146,6 +146,16 @@ class flyDbPdo extends flyDb
             $this->error = array("","","Column not found!");
             return $this->error();
         }
+        if(isset($keyColumn) && !isset($result[0][$keyColumn])){
+            $this->hasError = true;
+            $this->error = array("","","No key '{$keyColumn}' found!");
+            return $this->error();
+        }
+        if(isset($valueColumn) && !isset($result[0][$valueColumn])){
+            $this->hasError = true;
+            $this->error = array("","","No key '{$valueColumn}' found!");
+            return $this->error();
+        }
         foreach($result as $row){
             $aKeyVakue[ $row[$keyColumn] ] = $row[$valueColumn];
         }

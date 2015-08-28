@@ -144,6 +144,8 @@ class flyDbPdoTest extends PHPUnit_Extensions_Database_TestCase
         $this->assertEquals("array", gettype($hash));
         $this->assertEquals($array[0]['title'], $hash[$array[0]['id']]);
         $this->assertEquals($array[3]['title'], $hash[$array[3]['id']]);
+
+        $hash = $this->db->fetchKeyValue("SELECT id, title, number FROM {$table} LIMIT 5", "title", "number" );
     }
 
 
@@ -174,6 +176,14 @@ class flyDbPdoTest extends PHPUnit_Extensions_Database_TestCase
 
         //wrong column
         $result = $this->db->fetchColumn("SELECT * FROM {$table}", "name");
+        $this->assertFalse($result);
+
+        //wrong column
+        $result = $this->db->fetchKeyValue("SELECT * FROM {$table}", "name", "number");
+        $this->assertFalse($result);
+
+        //wrong column
+        $result = $this->db->fetchKeyValue("SELECT a FROM {$table}");
         $this->assertFalse($result);
 
         //throw exception
