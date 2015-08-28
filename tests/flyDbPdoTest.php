@@ -135,7 +135,15 @@ class flyDbPdoTest extends PHPUnit_Extensions_Database_TestCase
 
 
     public function testFetchKeyValue() {
+        $table = "testFetchAll";
 
+        $array = $this->db->fetchAll("SELECT id, title FROM {$table} LIMIT 5");
+        $hash = $this->db->fetchKeyValue("SELECT id, title FROM {$table} LIMIT 5");
+        $this->assertNotFalse($hash);
+        $this->assertEquals(5, sizeof($hash));
+        $this->assertEquals("array", gettype($hash));
+        $this->assertEquals($array[0]['title'], $hash[$array[0]['id']]);
+        $this->assertEquals($array[3]['title'], $hash[$array[3]['id']]);
     }
 
 
