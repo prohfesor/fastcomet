@@ -169,9 +169,9 @@ class flyDbPdo extends flyDb
      * @return bool
      * @throws Exception
      */
-    private function error(){
+    private function error($message =null){
         $this->hasError = true;
-        $this->error = $this->pdo->errorInfo();
+        $this->error = (empty($message))  ?  $this->pdo->errorInfo()  :  $message;
 
         if($this->configThrowException){
             throw new Exception($this->getError());
