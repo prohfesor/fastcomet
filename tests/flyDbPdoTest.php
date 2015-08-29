@@ -47,9 +47,9 @@ class flyDbPdoTest extends PHPUnit_Extensions_Database_TestCase
     public function __destruct() {
         $this->db = null;
 
-        if(is_file($this->dbfile)){
-            @chmod($this->dbfile, 0777);
-            @unlink($this->dbfile);
+        if(isset($this->dbFilename) && is_file($this->dbFilename)){
+            @chmod($this->dbFilename, 0777);
+            @unlink($this->dbFilename);
         }
     }
 
