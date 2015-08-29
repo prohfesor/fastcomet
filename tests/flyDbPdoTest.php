@@ -206,4 +206,18 @@ class flyDbPdoTest extends PHPUnit_Extensions_Database_TestCase
     }
 
 
+    public function testGettersAndSetters() {
+        $conf = $this->db->getConfigThrowException();
+        $this->assertTrue($conf); //defaults to true
+
+        $table = "testExec";
+        $result = $this->db->insert("INSERT INTO {$table} ('name') VALUES ('xyz')");
+        $this->assertEquals($result, $this->db->getLastInsertId());
+
+        $table = "testFetchAll";
+        $result = $this->db->exec("UPDATE {$table} SET title='abcdef' WHERE title LIKE 'a%'");
+        $this->assertEquals($result, $this->db->getLastAffectedRows());
+    }
+
+
 }
