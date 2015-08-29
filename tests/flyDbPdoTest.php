@@ -137,7 +137,7 @@ class flyDbPdoTest extends PHPUnit_Extensions_Database_TestCase
     public function testFetchKeyValue() {
         $table = "testFetchAll";
 
-        $array = $this->db->fetchAll("SELECT id, title FROM {$table} LIMIT 5");
+        $array = $this->db->fetchAll("SELECT id, title, number FROM {$table} LIMIT 5");
         $hash = $this->db->fetchKeyValue("SELECT id, title FROM {$table} LIMIT 5");
         $this->assertNotFalse($hash);
         $this->assertEquals(5, sizeof($hash));
@@ -146,6 +146,10 @@ class flyDbPdoTest extends PHPUnit_Extensions_Database_TestCase
         $this->assertEquals($array[3]['title'], $hash[$array[3]['id']]);
 
         $hash = $this->db->fetchKeyValue("SELECT id, title, number FROM {$table} LIMIT 5", "title", "number" );
+        $this->assertEquals($array[0]['number'], $hash[$array[0]['title']]);
+        $this->assertEquals($array[3]['number'], $hash[$array[3]['title']]);
+
+
     }
 
 
@@ -179,11 +183,19 @@ class flyDbPdoTest extends PHPUnit_Extensions_Database_TestCase
         $this->assertFalse($result);
 
         //wrong column
-        $result = $this->db->fetchKeyValue("SELECT * FROM {$table}", "name", "number");
+        $result = $this->db->fetchKeyValue("SELECT * FROM {$table}", "title", "name");
         $this->assertFalse($result);
 
         //wrong column
-        $result = $this->db->fetchKeyValue("SELECT a FROM {$table}");
+        $result = $this->db->fetchKeyValue("SELECT * FROM {$table}", "name", "number");
+        $this->assertFalse($result);
+
+        //wrong query
+        $result = $this->db->fetchKeyValue("WEFWFWF", "name", "number");
+        $this->assertFalse($result);
+
+        //empty result
+        $hash = $this->db->fetchKeyValue("SELECT * FROM {$table} WHERE id LIKE 'a%'");
         $this->assertFalse($result);
 
         //throw exception

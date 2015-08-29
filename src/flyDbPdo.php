@@ -127,7 +127,7 @@ class flyDbPdo extends flyDb
         if($result === false) {
             return $this->error();
         }
-        $aKeyVakue = array();
+        $aKeyValue = array();
         if(!$keyColumn && isset($result[0])){
             $keys = array_keys($result[0]);
             $keyColumn =  $keys[0];
@@ -141,25 +141,25 @@ class flyDbPdo extends flyDb
                 $previous = $key;
             }
         }
-        if(!isset($keyColumn) || !isset($valueColumn)) {
+        if(!$keyColumn || !$valueColumn) {
             $this->hasError = true;
             $this->error = array("","","Column not found!");
             return $this->error();
         }
-        if(isset($keyColumn) && !isset($result[0][$keyColumn])){
+        if($keyColumn && !isset($result[0][$keyColumn])){
             $this->hasError = true;
             $this->error = array("","","Column '{$keyColumn}' not found!");
             return $this->error();
         }
-        if(isset($valueColumn) && !isset($result[0][$valueColumn])){
+        if($valueColumn && !isset($result[0][$valueColumn])){
             $this->hasError = true;
             $this->error = array("","","Column '{$valueColumn}' not found!");
             return $this->error();
         }
         foreach($result as $row){
-            $aKeyVakue[ $row[$keyColumn] ] = $row[$valueColumn];
+            $aKeyValue[ $row[$keyColumn] ] = $row[$valueColumn];
         }
-        return $aKeyVakue;
+        return $aKeyValue;
     }
 
     /**
