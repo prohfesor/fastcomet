@@ -123,6 +123,20 @@ class flyDbPdoTest extends PHPUnit_Extensions_Database_TestCase
     }
 
 
+    public function testFetchValue() {
+        $table = "testFetchAll";
+
+        $result = $this->db->fetchValue("SELECT title FROM {$table} LIMIT 3");
+        $this->assertNotFalse($result);
+        $this->assertEquals("string", gettype($result));
+
+        $result = $this->db->fetchValue("SELECT title, number FROM {$table} LIMIT 3", 'number');
+        $this->assertNotFalse($result);
+        $this->assertEquals("string", gettype($result));
+        $this->assertTrue(is_numeric($result));
+    }
+
+
     public function testFetchColumn() {
         $table = "testFetchAll";
 
@@ -175,6 +189,14 @@ class flyDbPdoTest extends PHPUnit_Extensions_Database_TestCase
         $this->assertFalse($result);
 
         //wrong column
+        $result = $this->db->fetchValue("SELECT name, phone FROM {$table}");
+        $this->assertFalse($result);
+
+        //wrong column
+        $result = $this->db->fetchValue("SELECT * FROM {$table}", "name");
+        $this->assertFalse($result);
+
+        //wrong column
         $result = $this->db->fetchColumn("SELECT name, phone FROM {$table}");
         $this->assertFalse($result);
 
@@ -196,7 +218,7 @@ class flyDbPdoTest extends PHPUnit_Extensions_Database_TestCase
 
         //empty result
         $hash = $this->db->fetchKeyValue("SELECT * FROM {$table} WHERE id LIKE 'a%'");
-        $this->assertFalse($result);
+        $this->assertFalse($hash);
 
         //throw exception
         $this->db->setConfigThrowException(true);
