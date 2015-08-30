@@ -91,6 +91,14 @@ class flyDbPdo extends flyDb
     }
 
     /**
+     * @inheritdoc
+     */
+    public function fetchValue($query, $columnName = false)
+    {
+
+    }
+
+    /**
      * @inheritDoc
      */
     public function fetchColumn($query, $columnName = false)

@@ -58,8 +58,17 @@
     }
 
      /**
+      * Returns first value of one cell from first row in result set.
+      * If $columnName not specified - take first column.
+      * @param $query
+      * @param $columnName
+      * @return mixed
+      */
+    abstract public function fetchValue($query, $columnName =false);
+
+     /**
       * Returns array of one column of results set.
-      * If $columnName not specified - take first column
+      * If $columnName not specified - take first column.
       * @param $query
       * @param $columnName
       * @return mixed

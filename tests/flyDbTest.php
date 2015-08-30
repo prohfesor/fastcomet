@@ -41,7 +41,7 @@ class flyDbTest extends PHPUnit_Framework_TestCase
 
     public function flyDbMethodsProvider() {
         return array(
-            array("exec", "sql", "insert", "fetchAll", "fetchOne", "fetchRow", "fetchColumn", "fetchKeyValue")
+            array("exec", "sql", "insert", "fetchAll", "fetchOne", "fetchRow", "fetchValue", "fetchColumn", "fetchKeyValue")
         );
     }
 
