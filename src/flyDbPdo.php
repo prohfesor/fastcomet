@@ -95,22 +95,21 @@ class flyDbPdo extends flyDb
      */
     public function fetchValue($query, $columnName = false)
     {
-        $result = $this->fetchAll($query);
+        $result = $this->fetchOne($query);
         if($result === false){
             return $this->error();
         }
-        $column = array();
-        if(!$columnName && isset($result[0])){
-            $keys = array_keys($result[0]);
+        if(!$columnName){
+            $keys = array_keys($result);
             $columnName = (isset($keys[0])) ? $keys[0]  :  false;
         }
-        if($columnName && isset($result[0]) && !isset($result[0][$columnName])){
+        if($columnName && !isset($result[$columnName])){
             $columnName = false;
         }
         if(!$columnName) {
             return $this->error("Column not found!");
         }
-        return $result[0][$columnName];
+        return $result[$columnName];
     }
 
     /**
