@@ -176,6 +176,25 @@ class flyDbPdo extends flyDb
         return $aKeyValue;
     }
 
+
+    /**
+     * @inheritDoc
+     */
+    public function fetchObject($query, $className = false)
+    {
+        // TODO: Implement fetchObject() method.
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function fetchObjects($query, $className = false)
+    {
+        // TODO: Implement fetchObjects() method.
+    }
+
+
     /**
      * Get error message from pdo and set error flag.
      * Throws exception unless $this->configThrowException is false

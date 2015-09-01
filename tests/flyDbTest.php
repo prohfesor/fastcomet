@@ -39,9 +39,26 @@ class flyDbTest extends PHPUnit_Framework_TestCase
         $this->assertEquals( $stub->fetchRow("another query"), $arr);
     }
 
+
+    public function testEscape() {
+        $stub = $this->getMockForAbstractClass("flyDb");
+
+        $var = "ABCDEFGH:/MNRPQR/";
+        $this->assertEquals("ABCDEFGH:/MNRPQR/", $stub->escape($var));
+
+        $var = "Hello 'world'!!! \"BIG WORLD\"";
+        $this->assertEquals('Hello \\\'world\\\'!!! \\"BIG WORLD\\"', $stub->escape($var));
+
+        $queryWithParams = "SELECT * FROM sometable WHERE name=:? AND title LIKE :?";
+        $params = array("John", "Mc'Crea%");
+        $queryPrepared = 'SELECT * FROM sometable WHERE name="John" AND title LIKE "Mc\\\'Crea%"';
+        $this->assertEquals($queryPrepared, $stub->escape($queryWithParams, $params));
+    }
+
+
     public function flyDbMethodsProvider() {
         return array(
-            array("exec", "sql", "insert", "fetchAll", "fetchOne", "fetchRow", "fetchValue", "fetchColumn", "fetchKeyValue")
+            array("exec", "sql", "insert", "fetchAll", "fetchOne", "fetchRow", "fetchValue", "fetchColumn", "fetchKeyValue", "fetchObject", "fetchObjects", "escape")
         );
     }
 

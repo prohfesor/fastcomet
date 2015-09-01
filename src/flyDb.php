@@ -104,4 +104,34 @@
       */
     abstract public function fetchObjects($query, $className =false);
 
+     /**
+      * Escapes var or query to be SQL injection safe.
+      * Use question marks in query (":?") for placeholders.
+      * @param $query
+      * @param array $params
+      * @return string
+      */
+    public function escape($query, $params =array()) {
+        if(empty($params)) {
+            $query = $this->addslashes($query);
+        } else {
+            foreach($params as $param) {
+                $value = $this->addslashes($param);
+                $query = substr_replace($query, "\"{$value}\"", strpos($query, ":?"), 2);
+            }
+        }
+        return $query;
+    }
+
+     /**
+      * Escapes string, used internally in $this->escape()
+      * @param $value
+      * @return string
+      */
+     private function addslashes($value) {
+         $string = stripslashes($value);
+         $string = addslashes($string);
+         return $string;
+     }
+
 }
