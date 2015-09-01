@@ -162,8 +162,6 @@ class flyDbPdoTest extends PHPUnit_Extensions_Database_TestCase
         $hash = $this->db->fetchKeyValue("SELECT id, title, number FROM {$table} LIMIT 5", "title", "number" );
         $this->assertEquals($array[0]['number'], $hash[$array[0]['title']]);
         $this->assertEquals($array[3]['number'], $hash[$array[3]['title']]);
-
-
     }
 
 
@@ -228,6 +226,28 @@ class flyDbPdoTest extends PHPUnit_Extensions_Database_TestCase
     }
 
 
+    public function testFetchObjects() {
+        $table = "testFetchAll";
+        $this->db->setConfigThrowException(false);
+
+        $result = $this->db->fetchObject("SELECT * FROM {$table}");
+        $this->assertEquals("stdClass", get_class($result));
+        $this->assertObjectHasAttribute("id", $result);
+        $this->assertObjectHasAttribute("title", $result);
+
+        $result = $this->db->fetchObjects("SELECT * FROM {$table}");
+        $this->assertInternalType("array", $result);
+        $this->assertEquals("stdClass", get_class($result[0]));
+        $this->assertObjectHasAttribute("id", $result[0]);
+        $this->assertObjectHasAttribute("title", $result[0]);
+
+        $result = $this->db->fetchObjects("SELECT * FROM {$table}", "testFetch");
+        $this->assertEquals("testFetch", get_class($result[0]));
+        $this->assertObjectHasAttribute("id", $result[0]);
+        $this->assertObjectHasAttribute("title", $result[0]);
+    }
+
+
     public function testGettersAndSetters() {
         $conf = $this->db->getConfigThrowException();
         $this->assertTrue($conf); //defaults to true
@@ -242,4 +262,11 @@ class flyDbPdoTest extends PHPUnit_Extensions_Database_TestCase
     }
 
 
+}
+
+
+class testFetch {
+    var $id;
+    var $title;
+    var $number;
 }
