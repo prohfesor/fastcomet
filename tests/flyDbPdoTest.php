@@ -165,6 +165,29 @@ class flyDbPdoTest extends PHPUnit_Extensions_Database_TestCase
     }
 
 
+
+    public function testFetchObjects() {
+        $table = "testFetchAll";
+        $this->db->setConfigThrowException(false);
+
+        $result = $this->db->fetchObject("SELECT * FROM {$table}");
+        $this->assertEquals("stdClass", get_class($result));
+        $this->assertObjectHasAttribute("id", $result);
+        $this->assertObjectHasAttribute("title", $result);
+
+        $result = $this->db->fetchObjects("SELECT * FROM {$table}");
+        $this->assertInternalType("array", $result);
+        $this->assertEquals("stdClass", get_class($result[0]));
+        $this->assertObjectHasAttribute("id", $result[0]);
+        $this->assertObjectHasAttribute("title", $result[0]);
+
+        $result = $this->db->fetchObjects("SELECT * FROM {$table}", "testFetch");
+        $this->assertEquals("testFetch", get_class($result[0]));
+        $this->assertObjectHasAttribute("id", $result[0]);
+        $this->assertObjectHasAttribute("title", $result[0]);
+    }
+
+
     public function testErrors() {
         $table = "testFetchAll";
         $this->db->setConfigThrowException(false);
@@ -218,33 +241,19 @@ class flyDbPdoTest extends PHPUnit_Extensions_Database_TestCase
         $hash = $this->db->fetchKeyValue("SELECT * FROM {$table} WHERE id LIKE 'a%'");
         $this->assertFalse($hash);
 
+        //wrong column
+        $result = $this->db->fetchObjects("SELECT unit FROM {$table}");
+        $this->assertFalse($result);
+
+        //wrong query
+        $result = $this->db->fetchObject("SELECT * FROM {$table}Iu");
+        $this->assertFalse($result);
+
         //throw exception
         $this->db->setConfigThrowException(true);
         $this->setExpectedException("Exception");
         $this->db->fetchOne("SELECT name, phone FROM {$table}");
         $this->db->insert("INSERT INTO {$table} VALUES ('RRR', 'OOO', 'AAA', 'RRR')");
-    }
-
-
-    public function testFetchObjects() {
-        $table = "testFetchAll";
-        $this->db->setConfigThrowException(false);
-
-        $result = $this->db->fetchObject("SELECT * FROM {$table}");
-        $this->assertEquals("stdClass", get_class($result));
-        $this->assertObjectHasAttribute("id", $result);
-        $this->assertObjectHasAttribute("title", $result);
-
-        $result = $this->db->fetchObjects("SELECT * FROM {$table}");
-        $this->assertInternalType("array", $result);
-        $this->assertEquals("stdClass", get_class($result[0]));
-        $this->assertObjectHasAttribute("id", $result[0]);
-        $this->assertObjectHasAttribute("title", $result[0]);
-
-        $result = $this->db->fetchObjects("SELECT * FROM {$table}", "testFetch");
-        $this->assertEquals("testFetch", get_class($result[0]));
-        $this->assertObjectHasAttribute("id", $result[0]);
-        $this->assertObjectHasAttribute("title", $result[0]);
     }
 
 
@@ -265,6 +274,10 @@ class flyDbPdoTest extends PHPUnit_Extensions_Database_TestCase
 }
 
 
+/**
+ * Class testFetch
+ * Used to test fetchObject() and fetchObjects()
+ */
 class testFetch {
     var $id;
     var $title;
