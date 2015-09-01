@@ -86,4 +86,22 @@
       */
     abstract public function fetchKeyValue($query, $keyColumn =false, $valueColumn =false);
 
+     /**
+      * Returns object from first row in result set.
+      * If $className is not set - then uses stdClass
+      * @param $query
+      * @param bool|false $className
+      * @return mixed
+      */
+    abstract public function fetchObject($query, $className =false);
+
+     /**
+      * Returns array of objects.
+      * If $className is not set - then uses stdClass
+      * @param $query
+      * @param bool|false $className
+      * @return mixed
+      */
+    abstract public function fetchObjects($query, $className =false);
+
 }
