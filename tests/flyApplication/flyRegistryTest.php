@@ -6,7 +6,7 @@
  * Time: 13:20
  */
 
-require_once '../src/flyRegistry.php';
+require_once '../src/flyApplication/flyRegistry.php';
 
 class flyRegistryTest extends PHPUnit_Framework_TestCase
 {

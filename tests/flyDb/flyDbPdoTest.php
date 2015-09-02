@@ -97,8 +97,8 @@ class flyDbPdoTest extends PHPUnit_Extensions_Database_TestCase
         //each insert returns autoincrement
         $rows = rand(5,20);
         for($i=1;$i<=$rows;$i++){
-            $title = flyFunc::generate_string();
-            $number = flyFunc::generate_string( rand(5,10), "0123456789");
+            $title = flyHelperString::generate_string();
+            $number = flyHelperString::generate_string( rand(5,10), "0123456789");
             $result = $this->db->insert("INSERT INTO {$table} (title, number) VALUES ('{$title}', '{$number}')");
             $this->assertGreaterThan(0, $result);
         }
