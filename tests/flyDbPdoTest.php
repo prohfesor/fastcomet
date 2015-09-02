@@ -1,7 +1,7 @@
 <?php
 
-require_once "../src/flyDb.php";
-require_once "../src/flyDbPdo.php";
+require_once "../src/flyDb/flyDb.php";
+require_once "../src/flyDb/flyDbPdo.php";
 
 /**
  * author: @prohfesor

@@ -7,7 +7,7 @@
  * Time: 16:52
  */
 
-require_once "../src/flyDb.php";
+require_once "../src/flyDb/flyDb.php";
 
 class flyDbTest extends PHPUnit_Framework_TestCase
 {
