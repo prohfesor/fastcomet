@@ -9,12 +9,50 @@
 abstract class flyDbOrm
 {
 
-    abstract public function get();
-    abstract public function getFirst();
+    /**
+     * Return object by Id
+     * @return mixed
+     */
+    abstract public function get($id);
+
+    /**
+     * Return first object in result set
+     * @param $criteria
+     * @return mixed
+     */
+    abstract public function getFirst($criteria =array());
+
+    /**
+     * Return array of all results set
+     * @return mixed
+     */
     abstract public function getAll();
-    abstract public function findBy();
-    abstract public function findOneBy();
-    abstract public function set();
+
+    /**
+     * Return array of all results by search criteria
+     * @param array $criteria
+     * @return mixed
+     */
+    abstract public function findBy($criteria =array());
+
+    /**
+     * Return first row from result set.
+     * @param array $criteria
+     * @return mixed
+     */
+    abstract public function findOneBy($criteria =array());
+
+    /**
+     * Set new values
+     * @param array $values
+     * @return mixed
+     */
+    abstract public function set($values =array());
+
+    /**
+     * Save object
+     * @return mixed
+     */
     abstract public function save();
 
 }
