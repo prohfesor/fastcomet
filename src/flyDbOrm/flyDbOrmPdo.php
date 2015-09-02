@@ -8,13 +8,27 @@
  */
 class flyDbOrmPdo extends flyDbOrm
 {
+
+    /**
+     * @var flyDbPdo
+     */
+    private $db;
+    private $tableName;
+
+    public function __construct($db, $tableName) {
+        $this->db = $db;
+        $this->tableName = $tableName;
+    }
+
     /**
      * @inheritDoc
      */
     public function get($id)
     {
-        // TODO: Implement get() method.
+        $query = $this->db->escape("SELECT * FROM {$this->tableName} WHERE id=:?", array($id));
+        return $this->db->fetchObject($query);
     }
+
 
     /**
      * @inheritDoc
