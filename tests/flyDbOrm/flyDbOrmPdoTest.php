@@ -90,7 +90,7 @@ class flyDbOrmPdoTest extends PHPUnit_Extensions_Database_TestCase
 
     public function testGetAll()
     {
-        $id = rand(1,sizeof($this->fixture));
+        $id = rand(0,sizeof($this->fixture)-1);
         $result = $this->orm->getAll();
         $this->assertNotFalse($result);
         $this->assertInternalType("array", $result);
