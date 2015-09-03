@@ -36,7 +36,12 @@ class flyDbOrmPdoTest extends PHPUnit_Extensions_Database_TestCase
 
     public function getDataset() {
         $this->db->exec("CREATE TABLE IF NOT EXISTS {$this->dbTableName} (id INT, name VARCHAR(50), phone DECIMAL(10), address TEXT)");
-        $ds = $this->createArrayDataSet(array());
+        $ds = $this->createArrayDataSet(array(
+            $this->dbTableName => array(
+                array( 'id'=>1 , 'name'=>'John Doe', 'phone'=>'223322', 'address'=>'5th Avenue 123/4 5 NY CA 66555'),
+                array( 'id'=>2 , 'name'=>'Leonardo Di Caprio', 'phone'=>'2774485', 'address'=>'9255 Sunset Blvd.\n Suite 615\nWest Hollywood, CA 90069')
+            )
+        ));
         return $ds;
     }
 
