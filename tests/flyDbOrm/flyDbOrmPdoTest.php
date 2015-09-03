@@ -17,11 +17,20 @@ class flyDbOrmPdoTest extends PHPUnit_Extensions_Database_TestCase
      */
     private $db = null;
 
+    /**
+     * @var flyDbOrmPdo
+     */
     private $orm = null;
 
     private $dbFilename = null;
 
     private $dbTableName = "testOrm";
+
+    private $fixture = array(
+        array( 'id'=>1 , 'name'=>'John Doe', 'phone'=>'223322', 'address'=>'5th Avenue 123/4 5 NY CA 66555'),
+        array( 'id'=>2 , 'name'=>'Leonardo Di Caprio', 'phone'=>'2774485', 'address'=>"9255 Sunset Blvd.\n Suite 615\nWest Hollywood, CA 90069"),
+        array( 'id'=>3 , 'name'=>'Jason Statham', 'phone'=>'3238229300', 'address'=>"8409 Santa Monica Blvd\nLos Angeles, CA 90069"),
+    );
 
 
     public function getConnection()
@@ -37,10 +46,7 @@ class flyDbOrmPdoTest extends PHPUnit_Extensions_Database_TestCase
     public function getDataset() {
         $this->db->exec("CREATE TABLE IF NOT EXISTS {$this->dbTableName} (id INT, name VARCHAR(50), phone DECIMAL(10), address TEXT)");
         $ds = $this->createArrayDataSet(array(
-            $this->dbTableName => array(
-                array( 'id'=>1 , 'name'=>'John Doe', 'phone'=>'223322', 'address'=>'5th Avenue 123/4 5 NY CA 66555'),
-                array( 'id'=>2 , 'name'=>'Leonardo Di Caprio', 'phone'=>'2774485', 'address'=>'9255 Sunset Blvd.\n Suite 615\nWest Hollywood, CA 90069')
-            )
+            $this->dbTableName => $this->fixture
         ));
         return $ds;
     }
@@ -65,17 +71,31 @@ class flyDbOrmPdoTest extends PHPUnit_Extensions_Database_TestCase
 
 
     public function testGet() {
-        $this->assertNotFalse(false);
+        $id = rand(1,sizeof($this->fixture));
+        $result = $this->orm->get($id);
+        $this->assertNotFalse($result);
+        $this->assertEquals("stdClass", get_class($result));
+        $this->assertEquals($id, $result->id);
     }
 
 
     public function testGetFirst() {
-
+        $result = $this->orm->getFirst();
+        $this->assertNotFalse($result);
+        $this->assertEquals("stdClass", get_class($result));
+        $this->assertObjectHasAttribute("id", $result);
+        $this->assertObjectHasAttribute("name", $result);
+        $this->assertObjectHasAttribute("address", $result);
     }
 
     public function testGetAll()
     {
-
+        $id = rand(1,sizeof($this->fixture));
+        $result = $this->orm->getAll();
+        $this->assertNotFalse($result);
+        $this->assertInternalType("array", $result);
+        $this->assertObjectHasAttribute("id", $result[$id]);
+        $this->assertObjectHasAttribute("name", $result[$id]);
     }
 
     public function testFindBy()

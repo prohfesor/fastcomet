@@ -20,7 +20,7 @@ abstract class flyDbOrm
      * @param $criteria
      * @return mixed
      */
-    abstract public function getFirst($criteria =array());
+    abstract public function getFirst();
 
     /**
      * Return array of all results set

@@ -33,9 +33,10 @@ class flyDbOrmPdo extends flyDbOrm
     /**
      * @inheritDoc
      */
-    public function getFirst($criteria = array())
+    public function getFirst()
     {
-        // TODO: Implement getFirst() method.
+        $query = $this->db->escape("SELECT * FROM {$this->tableName}");
+        return $this->db->fetchObject($query);
     }
 
     /**
@@ -43,7 +44,8 @@ class flyDbOrmPdo extends flyDbOrm
      */
     public function getAll()
     {
-        // TODO: Implement getAll() method.
+        $query = $this->db->escape("SELECT * FROM {$this->tableName}");
+        return $this->db->fetchObjects($query);
     }
 
     /**
