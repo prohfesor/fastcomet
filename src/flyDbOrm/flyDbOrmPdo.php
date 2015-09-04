@@ -53,7 +53,15 @@ class flyDbOrmPdo extends flyDbOrm
      */
     public function findBy($criteria = array())
     {
-        // TODO: Implement findBy() method.
+        $paramString = "";
+        foreach($criteria as $k=>$v){
+            if(!empty($paramString)){
+                $paramString .= " AND ";
+            }
+            $paramString .= "{$k} = :?";
+        }
+        $query = $this->db->escape("SELECT * FROM {$this->tableName} WHERE {$paramString}", $criteria);
+        return $this->db->fetchObjects($query);
     }
 
     /**
@@ -61,13 +69,21 @@ class flyDbOrmPdo extends flyDbOrm
      */
     public function findOneBy($criteria = array())
     {
-        // TODO: Implement findOneBy() method.
+        $paramString = "";
+        foreach($criteria as $k=>$v){
+            if(!empty($paramString)){
+                $paramString .= " AND ";
+            }
+            $paramString .= "{$k} = :?";
+        }
+        $query = $this->db->escape("SELECT * FROM {$this->tableName} WHERE {$paramString}", $criteria);
+        return $this->db->fetchObject($query);
     }
 
     /**
      * @inheritDoc
      */
-    public function set($values = array())
+    public function set($values = array(), $value =null)
     {
         // TODO: Implement set() method.
     }

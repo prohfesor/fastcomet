@@ -45,9 +45,10 @@ abstract class flyDbOrm
     /**
      * Set new values
      * @param array $values
+     * @param $value
      * @return mixed
      */
-    abstract public function set($values =array());
+    abstract public function set($values =array(), $value =null);
 
     /**
      * Save object

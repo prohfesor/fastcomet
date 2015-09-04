@@ -88,6 +88,7 @@ class flyDbOrmPdoTest extends PHPUnit_Extensions_Database_TestCase
         $this->assertObjectHasAttribute("address", $result);
     }
 
+
     public function testGetAll()
     {
         $id = rand(0,sizeof($this->fixture)-1);
@@ -98,20 +99,35 @@ class flyDbOrmPdoTest extends PHPUnit_Extensions_Database_TestCase
         $this->assertObjectHasAttribute("name", $result[$id]);
     }
 
+
     public function testFindBy()
     {
+        $testRow = $this->fixture[ rand(0,2) ];
+        $result = $this->orm->findBy(array('name'=>$testRow['name']));
+        $this->assertInternalType("array", $result);
+        $result = $result[0];
+        $this->assertEquals($testRow['id'], $result->id);
 
+        $result = $this->orm->findBy(array('name'=>$testRow['name'], 'phone'=>$testRow['phone']));
+        $result = $result[0];
+        $this->assertEquals($testRow['id'], $result->id);
     }
+
 
     public function testFindOneBy()
     {
-
+        $testRow = $this->fixture[ rand(0,2) ];
+        $result = $this->orm->findOneBy(array('phone'=>$testRow['phone'], 'address'=>$testRow['address']));
+        $this->assertEquals("stdClass", get_class($result));
+        $this->assertEquals($testRow['id'], $result->id);
     }
+
 
     public function testSet()
     {
 
     }
+
 
     public function testSave(){
 
