@@ -18,7 +18,14 @@ class flyDbOrmPdo extends flyDbOrm
     public function __construct($db, $tableName) {
         $this->db = $db;
         $this->tableName = $tableName;
+        return $this;
     }
+
+
+    public function getTable($tableName) {
+        return new flyDbOrmPdo($this->db, $tableName);
+    }
+
 
     /**
      * @inheritDoc

@@ -70,6 +70,14 @@ class flyDbOrmPdoTest extends PHPUnit_Extensions_Database_TestCase
     }
 
 
+    public function testGetTable() {
+        $id = rand(1,sizeof($this->fixture));
+        $orm = $this->orm->getTable($this->dbTableName);
+        $result = $this->orm->get($id);
+        $this->assertEquals($result, $orm->get($id));
+    }
+
+
     public function testGet() {
         $id = rand(1,sizeof($this->fixture));
         $result = $this->orm->get($id);
