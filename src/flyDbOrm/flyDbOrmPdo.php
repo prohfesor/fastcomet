@@ -14,6 +14,7 @@ class flyDbOrmPdo extends flyDbOrm
      */
     private $db;
     private $tableName;
+    private $tableStructure;
 
     public function __construct($db, $tableName) {
         $this->db = $db;
@@ -103,4 +104,41 @@ class flyDbOrmPdo extends flyDbOrm
         // TODO: Implement save() method.
     }
 
+
+    public function getStructure() {
+        $this->db->setConfigThrowException(false);
+        if(!$this->tableStructure) {
+            //general sql query
+            $query = "SHOW COLUMNS FROM " . $this->db->escape($this->tableName);
+            $result = $this->db->fetchAll($query);
+            if ($result) {
+                $this->tableStructure = array();
+                foreach($result as $row) {
+                    $this->tableStructure[ $row['Field'] ] = $row;
+                }
+            }
+        }
+        if(!$this->tableStructure) {
+            //sqlite
+            $query = "PRAGMA table_info(".$this->db->escape($this->tableName).")";
+            $result = $this->db->fetchAll($query);
+            if($result) {
+                $this->tableStructure = array();
+                foreach($result as $row) {
+                    $this->tableStructure[ $row['name'] ] = $row;
+                }
+            }
+        }
+        if(!$this->tableStructure) {
+            //last chance - try only column titles
+            $result = $this->db->fetchOne("SELECT * FROM ".$this->db->escape($this->tableName));
+            if($result) {
+                $this->tableStructure = array();
+                foreach($result as $column=>$value) {
+                    $this->tableStructure[ $column ] = array();
+                }
+            }
+        }
+        return $this->tableStructure;
+    }
 }

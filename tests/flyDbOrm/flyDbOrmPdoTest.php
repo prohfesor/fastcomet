@@ -138,7 +138,7 @@ class flyDbOrmPdoTest extends PHPUnit_Extensions_Database_TestCase
 
 
     public function testSave(){
-
+        var_dump($this->orm->getTable($this->dbTableName)->getStructure());
     }
 
 
