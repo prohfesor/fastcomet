@@ -34,7 +34,7 @@ class flyDbOrmPdo extends flyDbOrm
     }
 
     public function setClassName($className) {
-        if (!empty($className) && class_exists($className) && is_a($className, __CLASS__)) {
+        if (!empty($className) && class_exists($className) && is_subclass_of($className, __CLASS__)) {
             $this->className = $className;
         } else {
             $this->className = null;
@@ -49,10 +49,56 @@ class flyDbOrmPdo extends flyDbOrm
      * @return flyDbOrmPdo
      */
     public function getTable($tableName) {
-        if(class_exists($tableName) && is_a($tableName, __CLASS__)) {
+        if(class_exists($tableName)) {
             $className = $this->setClassName($tableName);
         }
         return new flyDbOrmPdo($this->db, $tableName, $className);
+    }
+
+
+    public function getStructure() {
+        $this->db->setConfigThrowException(false);
+        if(!$this->tableStructure) {
+            //general sql query
+            $query = "SHOW COLUMNS FROM " . $this->db->escape($this->tableName);
+            $result = $this->db->fetchAll($query);
+            if ($result) {
+                $this->tableStructure = array();
+                foreach($result as $row) {
+                    $this->tableStructure[ $row['Field'] ] = array(
+                        'type' => $row['Type'] ,
+                        'null' => ($row['Null']=="YES") ? true : false ,
+                        'default' => ($row['Default']=="NULL") ? null : $row['Default']
+                    );
+                }
+            }
+        }
+        if(!$this->tableStructure) {
+            //sqlite
+            $query = "PRAGMA table_info(".$this->db->escape($this->tableName).")";
+            $result = $this->db->fetchAll($query);
+            if($result) {
+                $this->tableStructure = array();
+                foreach($result as $row) {
+                    $this->tableStructure[ $row['name'] ] = array(
+                        'type' => $row['type'],
+                        'null' => !(bool)$row['notnull'],
+                        'default' => $row['dflt_value']
+                    );
+                }
+            }
+        }
+        if(!$this->tableStructure) {
+            //last chance - try only column titles
+            $result = $this->db->fetchOne("SELECT * FROM ".$this->db->escape($this->tableName));
+            if($result) {
+                $this->tableStructure = array();
+                foreach($result as $column=>$value) {
+                    $this->tableStructure[ $column ] = array();
+                }
+            }
+        }
+        return $this->tableStructure;
     }
 
 
@@ -130,52 +176,6 @@ class flyDbOrmPdo extends flyDbOrm
     public function save()
     {
         // TODO: Implement save() method.
-    }
-
-
-    public function getStructure() {
-        $this->db->setConfigThrowException(false);
-        if(!$this->tableStructure) {
-            //general sql query
-            $query = "SHOW COLUMNS FROM " . $this->db->escape($this->tableName);
-            $result = $this->db->fetchAll($query);
-            if ($result) {
-                $this->tableStructure = array();
-                foreach($result as $row) {
-                    $this->tableStructure[ $row['Field'] ] = array(
-                        'type' => $row['Type'] ,
-                        'null' => ($row['Null']=="YES") ? true : false ,
-                        'default' => ($row['Default']=="NULL") ? null : $row['Default']
-                    );
-                }
-            }
-        }
-        if(!$this->tableStructure) {
-            //sqlite
-            $query = "PRAGMA table_info(".$this->db->escape($this->tableName).")";
-            $result = $this->db->fetchAll($query);
-            if($result) {
-                $this->tableStructure = array();
-                foreach($result as $row) {
-                    $this->tableStructure[ $row['name'] ] = array(
-                        'type' => $row['type'],
-                        'null' => !(bool)$row['notnull'],
-                        'default' => $row['dflt_value']
-                    );
-                }
-            }
-        }
-        if(!$this->tableStructure) {
-            //last chance - try only column titles
-            $result = $this->db->fetchOne("SELECT * FROM ".$this->db->escape($this->tableName));
-            if($result) {
-                $this->tableStructure = array();
-                foreach($result as $column=>$value) {
-                    $this->tableStructure[ $column ] = array();
-                }
-            }
-        }
-        return $this->tableStructure;
     }
 
 }
