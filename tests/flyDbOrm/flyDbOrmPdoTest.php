@@ -174,6 +174,6 @@ class flyDbOrmPdoTest extends PHPUnit_Extensions_Database_TestCase
 }
 
 
-class testOrm extends flyDbOrmPdo {
+class NotestOrm extends flyDbOrmPdo {
     public $id, $name, $phone, $address;
 }
