@@ -93,7 +93,7 @@
       * @param bool|false $className
       * @return mixed
       */
-    abstract public function fetchObject($query, $className =false);
+    abstract public function fetchObject($query, $className =false, $arguments =array());
 
      /**
       * Returns array of objects.
@@ -102,7 +102,7 @@
       * @param bool|false $className
       * @return mixed
       */
-    abstract public function fetchObjects($query, $className =false);
+    abstract public function fetchObjects($query, $className =false, $arguments =array());
 
      /**
       * Escapes var or query to be SQL injection safe.

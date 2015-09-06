@@ -28,7 +28,7 @@ class flyDbOrmPdo extends flyDbOrm
 
     public function getClassName() {
         if(empty($this->className) || !class_exists($this->className)){
-            return 'stdClass';
+            return __CLASS__;
         }
         return $this->className;
     }
@@ -108,7 +108,7 @@ class flyDbOrmPdo extends flyDbOrm
     public function get($id)
     {
         $query = $this->db->escape("SELECT * FROM {$this->tableName} WHERE id=:?", array($id));
-        return $this->db->fetchObject($query, $this->getClassName());
+        return $this->db->fetchObject($query, $this->getClassName(), array($this->db, $this->tableName));
     }
 
 
@@ -118,7 +118,7 @@ class flyDbOrmPdo extends flyDbOrm
     public function getFirst()
     {
         $query = $this->db->escape("SELECT * FROM {$this->tableName}");
-        return $this->db->fetchObject($query, $this->getClassName());
+        return $this->db->fetchObject($query, $this->getClassName(), array($this->db, $this->tableName));
     }
 
     /**
@@ -127,7 +127,7 @@ class flyDbOrmPdo extends flyDbOrm
     public function getAll()
     {
         $query = $this->db->escape("SELECT * FROM {$this->tableName}");
-        return $this->db->fetchObjects($query, $this->getClassName());
+        return $this->db->fetchObjects($query, $this->getClassName(), array($this->db, $this->tableName));
     }
 
     /**
@@ -143,7 +143,7 @@ class flyDbOrmPdo extends flyDbOrm
             $paramString .= "{$k} = :?";
         }
         $query = $this->db->escape("SELECT * FROM {$this->tableName} WHERE {$paramString}", $criteria);
-        return $this->db->fetchObjects($query, $this->getClassName());
+        return $this->db->fetchObjects($query, $this->getClassName(), array($this->db, $this->tableName));
     }
 
     /**
@@ -159,7 +159,7 @@ class flyDbOrmPdo extends flyDbOrm
             $paramString .= "{$k} = :?";
         }
         $query = $this->db->escape("SELECT * FROM {$this->tableName} WHERE {$paramString}", $criteria);
-        return $this->db->fetchObject($query, $this->getClassName());
+        return $this->db->fetchObject($query, $this->getClassName(), array($this->db, $this->tableName));
     }
 
     /**
@@ -168,14 +168,10 @@ class flyDbOrmPdo extends flyDbOrm
     public function set($values = array(), $value =null)
     {
         $structure = $this->getStructure();
-        if(is_array($values)){
-            foreach($values as $key=>$value){
-                if(isset($structure[$key])){
-                    $this->key = $value;
-                }
-            }
-        } else {
-            $key = $values;
+        if(!is_array($values)){
+            $values = array($values=>$value);
+        }
+        foreach($values as $key=>$value){
             if(isset($structure[$key])){
                 $this->$key = $value;
             }

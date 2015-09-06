@@ -180,7 +180,7 @@ class flyDbPdo extends flyDb
     /**
      * @inheritDoc
      */
-    public function fetchObject($query, $className = false)
+    public function fetchObject($query, $className =false, $arguments =array())
     {
         $this->errorReset();
         $st = $this->pdo->prepare($query);
@@ -193,7 +193,7 @@ class flyDbPdo extends flyDb
         if(empty($className) || !class_exists($className)){
             $className = "stdClass";
         }
-        $row = $st->fetchObject($className);
+        $row = $st->fetchObject($className, $arguments);
         return $row;
     }
 
@@ -201,7 +201,7 @@ class flyDbPdo extends flyDb
     /**
      * @inheritDoc
      */
-    public function fetchObjects($query, $className = false)
+    public function fetchObjects($query, $className =false, $arguments =array())
     {
         $this->errorReset();
         $st = $this->pdo->prepare($query);
@@ -214,7 +214,7 @@ class flyDbPdo extends flyDb
         if(empty($className) || !class_exists($className)){
             $className = "stdClass";
         }
-        $row = $st->fetchAll(PDO::FETCH_CLASS, $className);
+        $row = $st->fetchAll(PDO::FETCH_CLASS, $className, $arguments);
         return $row;
     }
 
