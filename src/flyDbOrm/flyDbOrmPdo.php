@@ -16,6 +16,7 @@ class flyDbOrmPdo extends flyDbOrm
     private $tableName;
     private $tableStructure;
 
+
     public function __construct($db, $tableName) {
         $this->db = $db;
         $this->tableName = $tableName;
@@ -23,6 +24,11 @@ class flyDbOrmPdo extends flyDbOrm
     }
 
 
+    /**
+     * Get this class for specified table - useful for fetching rows.
+     * @param $tableName
+     * @return flyDbOrmPdo
+     */
     public function getTable($tableName) {
         return new flyDbOrmPdo($this->db, $tableName);
     }
@@ -114,7 +120,11 @@ class flyDbOrmPdo extends flyDbOrm
             if ($result) {
                 $this->tableStructure = array();
                 foreach($result as $row) {
-                    $this->tableStructure[ $row['Field'] ] = $row;
+                    $this->tableStructure[ $row['Field'] ] = array(
+                        'type' => $row['Type'] ,
+                        'null' => ($row['Null']=="YES") ? true : false ,
+                        'default' => ($row['Default']=="NULL") ? null : $row['Default']
+                    );
                 }
             }
         }
@@ -125,7 +135,11 @@ class flyDbOrmPdo extends flyDbOrm
             if($result) {
                 $this->tableStructure = array();
                 foreach($result as $row) {
-                    $this->tableStructure[ $row['name'] ] = $row;
+                    $this->tableStructure[ $row['name'] ] = array(
+                        'type' => $row['type'],
+                        'null' => !(bool)$row['notnull'],
+                        'default' => $row['dflt_value']
+                    );
                 }
             }
         }
@@ -141,4 +155,5 @@ class flyDbOrmPdo extends flyDbOrm
         }
         return $this->tableStructure;
     }
+
 }
