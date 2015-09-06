@@ -133,7 +133,18 @@ class flyDbOrmPdoTest extends PHPUnit_Extensions_Database_TestCase
 
     public function testSet()
     {
+        $row = rand(1, sizeof($this->fixture))-1;
+        $object = $this->orm->getTable($this->dbTableName)->get($row);
+        $newName = array_rand(array("Andrei", "Nikolai", "Daniel"));
+        $object->set('name', $newName);
+        $this->assertEquals($newName, $object->name);
 
+        $row = rand(1, sizeof($this->fixture))-1;
+        $newPhone = "232".rand("10000","70000");
+        $object = $this->orm->getTable($this->dbTableName)->get($row);
+        $object->set(array('name'=>$newName, 'phone'=>$newPhone));
+        $this->assertEquals($newName, $object->name);
+        $this->assertEquals($newPhone, $object->phone);
     }
 
 
@@ -152,6 +163,6 @@ class flyDbOrmPdoTest extends PHPUnit_Extensions_Database_TestCase
 }
 
 
-class testOrm {
+class testOrm extends flyDbOrmPdo {
     public $id, $name, $phone, $address;
 }
