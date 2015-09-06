@@ -49,6 +49,7 @@ class flyDbOrmPdo extends flyDbOrm
      * @return flyDbOrmPdo
      */
     public function getTable($tableName) {
+        $className = __CLASS__;
         if(class_exists($tableName)) {
             $className = $this->setClassName($tableName);
         }
