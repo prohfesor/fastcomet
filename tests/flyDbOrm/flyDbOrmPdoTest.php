@@ -131,6 +131,9 @@ class flyDbOrmPdoTest extends PHPUnit_Extensions_Database_TestCase
     }
 
 
+    /**
+     * @requires function nothing
+     */
     public function testSet()
     {
         $row = rand(1, sizeof($this->fixture))-1;
@@ -148,9 +151,17 @@ class flyDbOrmPdoTest extends PHPUnit_Extensions_Database_TestCase
     }
 
 
+    /**
+     * @requires function nothing
+     */
     public function testSave()
     {
-
+        $row = rand(1, sizeof($this->fixture))-1;
+        $newPhone = "232".rand("10000","70000");
+        $object = $this->orm->getTable($this->dbTableName)->get($row);
+        $object->set(array('phone'=>$newPhone));
+        $object->save();
+        $this->assertTableContains(array('id'=>$row, 'phone' => $newPhone), $this->dbTableName);
     }
 
 

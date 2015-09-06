@@ -15,12 +15,31 @@ class flyDbOrmPdo extends flyDbOrm
     private $db;
     private $tableName;
     private $tableStructure;
+    private $className;
 
 
-    public function __construct($db, $tableName) {
+    public function __construct($db, $tableName =null, $className =null) {
         $this->db = $db;
         $this->tableName = $tableName;
+        $this->setClassName($className);
         return $this;
+    }
+
+
+    public function getClassName() {
+        if(empty($this->className) || !class_exists($this->className)){
+            return 'stdClass';
+        }
+        return $this->className;
+    }
+
+    public function setClassName($className) {
+        if (!empty($className) && class_exists($className) && is_a($className, __CLASS__)) {
+            $this->className = $className;
+        } else {
+            $this->className = null;
+        }
+        return $this->className;
     }
 
 
@@ -30,7 +49,10 @@ class flyDbOrmPdo extends flyDbOrm
      * @return flyDbOrmPdo
      */
     public function getTable($tableName) {
-        return new flyDbOrmPdo($this->db, $tableName);
+        if(class_exists($tableName) && is_a($tableName, __CLASS__)) {
+            $className = $this->setClassName($tableName);
+        }
+        return new flyDbOrmPdo($this->db, $tableName, $className);
     }
 
 
@@ -40,7 +62,7 @@ class flyDbOrmPdo extends flyDbOrm
     public function get($id)
     {
         $query = $this->db->escape("SELECT * FROM {$this->tableName} WHERE id=:?", array($id));
-        return $this->db->fetchObject($query);
+        return $this->db->fetchObject($query, $this->getClassName());
     }
 
 
@@ -50,7 +72,7 @@ class flyDbOrmPdo extends flyDbOrm
     public function getFirst()
     {
         $query = $this->db->escape("SELECT * FROM {$this->tableName}");
-        return $this->db->fetchObject($query);
+        return $this->db->fetchObject($query, $this->getClassName());
     }
 
     /**
@@ -59,7 +81,7 @@ class flyDbOrmPdo extends flyDbOrm
     public function getAll()
     {
         $query = $this->db->escape("SELECT * FROM {$this->tableName}");
-        return $this->db->fetchObjects($query);
+        return $this->db->fetchObjects($query, $this->getClassName());
     }
 
     /**
@@ -75,7 +97,7 @@ class flyDbOrmPdo extends flyDbOrm
             $paramString .= "{$k} = :?";
         }
         $query = $this->db->escape("SELECT * FROM {$this->tableName} WHERE {$paramString}", $criteria);
-        return $this->db->fetchObjects($query);
+        return $this->db->fetchObjects($query, $this->getClassName());
     }
 
     /**
@@ -91,7 +113,7 @@ class flyDbOrmPdo extends flyDbOrm
             $paramString .= "{$k} = :?";
         }
         $query = $this->db->escape("SELECT * FROM {$this->tableName} WHERE {$paramString}", $criteria);
-        return $this->db->fetchObject($query);
+        return $this->db->fetchObject($query, $this->getClassName());
     }
 
     /**
