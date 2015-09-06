@@ -167,7 +167,20 @@ class flyDbOrmPdo extends flyDbOrm
      */
     public function set($values = array(), $value =null)
     {
-        // TODO: Implement set() method.
+        $structure = $this->getStructure();
+        if(is_array($values)){
+            foreach($values as $key=>$value){
+                if(isset($structure[$key])){
+                    $this->key = $value;
+                }
+            }
+        } else {
+            $key = $values;
+            if(isset($structure[$key])){
+                $this->$key = $value;
+            }
+        }
+        return $this;
     }
 
     /**

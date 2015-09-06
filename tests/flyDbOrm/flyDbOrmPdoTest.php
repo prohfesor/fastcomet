@@ -131,9 +131,6 @@ class flyDbOrmPdoTest extends PHPUnit_Extensions_Database_TestCase
     }
 
 
-    /**
-     * @requires function nothing
-     */
     public function testSet()
     {
         $row = rand(1, sizeof($this->fixture))-1;
