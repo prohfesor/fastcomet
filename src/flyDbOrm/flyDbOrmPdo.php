@@ -200,7 +200,7 @@ class flyDbOrmPdo extends flyDbOrm
             $set .= "{$key}=:?";
             $params[$key] = $this->$key;
         }
-        if($this->id){
+        if(!empty($this->id)){
             $query = "UPDATE {$this->tableName} SET $set WHERE id={$this->id}";
         } else {
             $insertKeys = array_keys($params);
