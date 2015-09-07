@@ -160,6 +160,13 @@ class flyDbOrmPdoTest extends PHPUnit_Extensions_Database_TestCase
         $actor = $this->db->fetchOne("SELECT * FROM {$this->dbTableName} WHERE id={$row}");
         $this->assertNotFalse($actor);
         $this->assertEquals($object->phone, $actor['phone']);
+
+        $new = new flyDbOrmPdo($this->db, $this->dbTableName);
+        $new->set(array(
+            "name" => "Richard Branson",
+            "address" => "50 Brook Green\nHammersmith\nLondon, W6 7RR\nUK"
+        ))->save();
+        $this->assertTableRowCount($this->dbTableName, sizeof($this->fixture)+1);
     }
 
 

@@ -189,19 +189,28 @@ class flyDbOrmPdo extends flyDbOrm
         $params = array();
         $keys = array_keys($this->getStructure());
         foreach($keys as $key) {
-            if(!isset($this->$key)){
+            //TODO: customize id column
+            if(!isset($this->$key) || $key=="id"){
                 continue;
             }
             if(!empty($set)){
                 $set .= ", ";
             }
+            //TODO: better escaping params
             $set .= "{$key}=:?";
             $params[$key] = $this->$key;
         }
-        $insert = "INSERT INTO {$this->tableName} SET $set";
-        $update = "UPDATE {$this->tableName} SET $set WHERE id={$this->id}";
-        $query = ($this->id) ? $update : $insert;
-        return (bool)$this->db->exec( $this->db->escape($query, $params) );
+        if($this->id){
+            $query = "UPDATE {$this->tableName} SET $set WHERE id={$this->id}";
+        } else {
+            $insertKeys = array_keys($params);
+            $insertValues = array_fill(0, sizeof($insertKeys), ":?");
+            $insertKeys = implode(",", $insertKeys);
+            $insertValues = implode(",", $insertValues);
+            $query = "INSERT INTO {$this->tableName} ({$insertKeys}) VALUES ({$insertValues})";
+        }
+        $query = $this->db->escape($query, $params);
+        return (bool)$this->db->exec( $query );
     }
 
 }
