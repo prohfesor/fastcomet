@@ -185,7 +185,23 @@ class flyDbOrmPdo extends flyDbOrm
      */
     public function save()
     {
-        // TODO: Implement save() method.
+        $set = "";
+        $params = array();
+        $keys = array_keys($this->getStructure());
+        foreach($keys as $key) {
+            if(!isset($this->$key)){
+                continue;
+            }
+            if(!empty($set)){
+                $set .= ", ";
+            }
+            $set .= "{$key}=:?";
+            $params[$key] = $this->$key;
+        }
+        $insert = "INSERT INTO {$this->tableName} SET $set";
+        $update = "UPDATE {$this->tableName} SET $set WHERE id={$this->id}";
+        $query = ($this->id) ? $update : $insert;
+        return (bool)$this->db->exec( $this->db->escape($query, $params) );
     }
 
 }

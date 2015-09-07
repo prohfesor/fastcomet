@@ -156,7 +156,10 @@ class flyDbOrmPdoTest extends PHPUnit_Extensions_Database_TestCase
         $object = $this->orm->getTable($this->dbTableName)->get($row);
         $object->set(array('phone'=>$newPhone));
         $object->save();
-//        $this->assertTableContains(array('id'=>$row, 'phone' => $newPhone), $this->dbTableName);
+
+        $actor = $this->db->fetchOne("SELECT * FROM {$this->dbTableName} WHERE id={$row}");
+        $this->assertNotFalse($actor);
+        $this->assertEquals($object->phone, $actor['phone']);
     }
 
 
