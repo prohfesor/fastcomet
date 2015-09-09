@@ -75,6 +75,13 @@ class flyDbOrmPdoTest extends PHPUnit_Extensions_Database_TestCase
         $orm = $this->orm->getTable($this->dbTableName);
         $result = $this->orm->get($id);
         $this->assertEquals($result, $orm->get($id));
+
+        $id = rand(1,sizeof($this->fixture));
+        $className = "testOrmNo";
+        $orm->setClassName($className);
+        $result = $orm->get($id);
+        $this->assertEquals($className, get_class($result));
+        $this->assertEquals($result, $orm->get($id));
     }
 
 
@@ -179,6 +186,6 @@ class flyDbOrmPdoTest extends PHPUnit_Extensions_Database_TestCase
 }
 
 
-class NotestOrm extends flyDbOrmPdo {
+class testOrmNo extends flyDbOrmPdo {
     public $id, $name, $phone, $address;
 }
