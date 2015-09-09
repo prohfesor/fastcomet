@@ -75,15 +75,7 @@ class flyDbOrmPdoAutoClassTest extends PHPUnit_Extensions_Database_TestCase
         $orm = $this->orm->getTable($this->dbTableName);
         $result = $this->orm->get($id);
         $this->assertEquals($result, $orm->get($id));
-    }
-
-
-    public function testGet() {
-        $id = rand(1,sizeof($this->fixture));
-        $result = $this->orm->get($id);
-        $this->assertNotFalse($result);
-        $this->assertEquals(get_class($this->orm), $this->dbTableName);
-        $this->assertEquals($id, $result->id);
+        $this->assertEquals(get_class($result), $this->dbTableName);
     }
 
 
