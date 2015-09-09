@@ -16,6 +16,7 @@ class flyDbOrmPdo extends flyDbOrm
     private $tableName;
     private $tableStructure;
     private $className;
+    private $idColumn;
 
 
     public function __construct($db, $tableName =null, $className =null) {
@@ -54,6 +55,11 @@ class flyDbOrmPdo extends flyDbOrm
             $className = $this->setClassName($tableName);
         }
         return new flyDbOrmPdo($this->db, $tableName, $className);
+    }
+
+
+    public function getIdColumn() {
+        return (!empty($this->idColumn)) ? $this->idColumn : "id";
     }
 
 
@@ -188,12 +194,12 @@ class flyDbOrmPdo extends flyDbOrm
         $set = "";
         $params = array();
         $keys = array_keys($this->getStructure());
+        $idColumn = $this->getIdColumn();
         foreach($keys as $key) {
-            //TODO: customize id column
-            if(!isset($this->$key) || $key=="id"){
+            if(!isset($this->$key) || $key==$idColumn){
                 continue;
             }
-            if(!empty($set)){
+            if(!empty($set)) {
                 $set .= ", ";
             }
             //TODO: better escaping params
@@ -201,7 +207,7 @@ class flyDbOrmPdo extends flyDbOrm
             $params[$key] = $this->$key;
         }
         if(!empty($this->id)){
-            $query = "UPDATE {$this->tableName} SET $set WHERE id={$this->id}";
+            $query = "UPDATE {$this->tableName} SET $set WHERE id={$idColumn}";
         } else {
             $insertKeys = array_keys($params);
             $insertValues = array_fill(0, sizeof($insertKeys), ":?");
