@@ -115,9 +115,15 @@
         if(empty($params)) {
             $query = $this->addslashes($query);
         } else {
-            foreach($params as $param) {
-                $value = $this->addslashes($param);
-                $query = substr_replace($query, "\"{$value}\"", strpos($query, ":?"), 2);
+            foreach($params as $key=>$param) {
+                $value = '"'.$this->addslashes($param).'"';
+                $count = 0;
+                if(!is_numeric($key)){
+                    $query = preg_replace("/=\s*:{$key}/", "=".$value, $query, 1, $count);
+                }
+                if(!$count){
+                    $query = preg_replace("/=\s*:\?/", "=".$value, $query, 1, $count);
+                }
             }
         }
         return $query;

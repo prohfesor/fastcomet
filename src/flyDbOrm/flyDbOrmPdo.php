@@ -105,6 +105,7 @@ class flyDbOrmPdo extends flyDbOrm
                 }
             }
         }
+        $this->db->setConfigThrowException(true);
         return $this->tableStructure;
     }
 
@@ -192,6 +193,7 @@ class flyDbOrmPdo extends flyDbOrm
     public function save()
     {
         $set = "";
+        $insert = "";
         $params = array();
         $keys = array_keys($this->getStructure());
         $idColumn = $this->getIdColumn();
@@ -201,19 +203,18 @@ class flyDbOrmPdo extends flyDbOrm
             }
             if(!empty($set)) {
                 $set .= ", ";
+                $insert .= ", ";
             }
-            //TODO: better escaping params
-            $set .= "{$key}=:?";
+            $set .= "{$key}=:{$key}";
+            $insert .= ":{$key}";
             $params[$key] = $this->$key;
         }
-        if(!empty($this->id)){
-            $query = "UPDATE {$this->tableName} SET $set WHERE id={$idColumn}";
+        if(!empty($this->$idColumn)){
+            $query = "UPDATE {$this->tableName} SET $set WHERE {$idColumn}={$this->$idColumn}";
         } else {
             $insertKeys = array_keys($params);
-            $insertValues = array_fill(0, sizeof($insertKeys), ":?");
             $insertKeys = implode(",", $insertKeys);
-            $insertValues = implode(",", $insertValues);
-            $query = "INSERT INTO {$this->tableName} ({$insertKeys}) VALUES ({$insertValues})";
+            $query = "INSERT INTO {$this->tableName} ({$insertKeys}) VALUES ({$insert})";
         }
         $query = $this->db->escape($query, $params);
         return (bool)$this->db->exec( $query );
