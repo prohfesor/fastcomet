@@ -116,17 +116,52 @@
         if(empty($params)) {
             $query = $this->addslashes($query);
         } else {
-            foreach($params as $key=>$param) {
-                $param = "\"" . $this->addslashes($param) . "\"";
-                if(is_numeric($key)) {
-                    $query = substr_replace($query, $param, strpos($query, ":?"), 2);
-                } else {
-                    $query = preg_replace("/:{$key}/", $param, $query, 1, $count);
-                    if(!$count){
-                        $query = substr_replace($query, $param, strpos($query, ":?"), 2);
+            //split query to parts by placeholders
+            $queryParts = array();
+            $start = 0;
+            for($i=0;$i<=strlen($query);$i++){
+                if($query{$i}==":"){
+                    for($k=$i+1;;$k++){
+                        if(false===stripos("?abcdefghijklmnopqrstuvwxyz1234567890", $query{$k})){
+                            break;
+                        }
+                        $placeholder = substr($query, $i, $k-$i+1);
                     }
+                    $queryParts[] = substr($query, $start, $i-$start);
+                    $queryParts[] = $placeholder;
+                    $start = $k;
                 }
             }
+            $queryParts[] = substr($query, $start);
+
+            //check empty last element
+            if(false===end($queryParts)){
+                array_pop($queryParts);
+            }
+
+            //replace named placeholders with values
+            $paramsCopy = $params;
+            foreach($queryParts as $k=>$part) {
+                if(":?"==$part || ":"!=$part{0}) {
+                    continue;
+                }
+                $key = substr($part, 1);
+                if(isset($params[$key])) {
+                    $queryParts[$k] = "\"" . $this->addslashes($params[$key]) . "\"";
+                    unset($paramsCopy[$key]);
+                }
+            }
+
+            //replace simple placeholders
+            foreach($queryParts as $k=>$part) {
+                if(":?"==$part) {
+                    $value = array_shift($paramsCopy);
+                    $queryParts[$k] = "\"" . $this->addslashes($value) . "\"";
+                }
+            }
+
+            //glue
+            $query = implode("", $queryParts);
         }
         return $query;
     }
