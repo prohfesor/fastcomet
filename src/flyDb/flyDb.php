@@ -135,7 +135,7 @@
             $queryParts[] = substr($query, $start);
 
             //check empty last element
-            if(false===end($queryParts)){
+            if(false===end($queryParts) || ""==end($queryParts)){
                 array_pop($queryParts);
             }
 
