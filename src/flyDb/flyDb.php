@@ -107,6 +107,7 @@
      /**
       * Escapes var or query to be SQL injection safe.
       * Use question marks in query (":?") for placeholders.
+      * Or use named placeholders (":title")
       * @param $query
       * @param array $params
       * @return string
@@ -116,13 +117,14 @@
             $query = $this->addslashes($query);
         } else {
             foreach($params as $key=>$param) {
-                $value = '"'.$this->addslashes($param).'"';
-                $count = 0;
-                if(!is_numeric($key)){
-                    $query = preg_replace("/=\s*:{$key}/", "=".$value, $query, 1, $count);
-                }
-                if(!$count){
-                    $query = preg_replace("/=\s*:\?/", "=".$value, $query, 1, $count);
+                $param = "\"" . $this->addslashes($param) . "\"";
+                if(is_numeric($key)) {
+                    $query = substr_replace($query, $param, strpos($query, ":?"), 2);
+                } else {
+                    $query = preg_replace("/:{$key}/", $param, $query, 1, $count);
+                    if(!$count){
+                        $query = substr_replace($query, $param, strpos($query, ":?"), 2);
+                    }
                 }
             }
         }
