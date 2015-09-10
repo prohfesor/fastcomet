@@ -149,6 +149,8 @@
                 if(isset($params[$key])) {
                     $queryParts[$k] = "\"" . $this->addslashes($params[$key]) . "\"";
                     unset($paramsCopy[$key]);
+                } else {
+                    $queryParts[$k] = '""';
                 }
             }
 

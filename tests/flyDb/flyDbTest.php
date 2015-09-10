@@ -53,6 +53,18 @@ class flyDbTest extends PHPUnit_Framework_TestCase
         $params = array("John", "Mc'Crea%");
         $queryPrepared = 'SELECT * FROM sometable WHERE name="John" AND title LIKE "Mc\\\'Crea%"';
         $this->assertEquals($queryPrepared, $stub->escape($queryWithParams, $params));
+
+        $queryWithParams = "SELECT * FROM sometable WHERE name=:name AND title LIKE :title";
+        $params = array('name'=>"John", 'title'=>"Mc'Crea%");
+        $this->assertEquals($queryPrepared, $stub->escape($queryWithParams, $params));
+
+        $query = "SELECT :?, :?, :? FROM sometable";
+        $params = array("A", "B");
+        $this->assertEquals("SELECT \"A\", \"B\", \"\" FROM sometable", $stub->escape($query, $params));
+
+        $query = "SELECT :name, :phone, :car FROM sometable";
+        $params = array('name'=>"Andrei", 'car'=>"Bentley");
+        $this->assertEquals("SELECT \"Andrei\", \"\", \"Bentley\" FROM sometable", $stub->escape($query, $params));
     }
 
 
