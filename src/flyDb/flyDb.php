@@ -119,9 +119,9 @@
             //split query to parts by placeholders
             $queryParts = array();
             $start = 0;
-            for($i=0;$i<=strlen($query);$i++){
+            for($i=0;$i<strlen($query);$i++){
                 if($query{$i}==":"){
-                    for($k=$i+1;;$k++){
+                    for($k=$i+1;$k<strlen($query);$k++){
                         if(false===stripos("?abcdefghijklmnopqrstuvwxyz1234567890", $query{$k})){
                             break;
                         }
