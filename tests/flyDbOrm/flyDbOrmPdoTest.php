@@ -177,6 +177,18 @@ class flyDbOrmPdoTest extends PHPUnit_Extensions_Database_TestCase
     }
 
 
+    public function testNew()
+    {
+        $result = $this->orm->create()->set(array("name"=>"Kristo Kaarman"))->save();
+        $this->assertNotFalse($result);
+        $this->assertTableRowCount($this->dbTableName, sizeof($this->fixture)+1);
+
+        $result = $this->orm->create(array("name"=>"Kaarel Kudu"))->save();
+        $this->assertNotFalse($result);
+        $this->assertTableRowCount($this->dbTableName, sizeof($this->fixture)+2);
+    }
+
+
     public function testGetStructure() {
         $structure = $this->orm->getTable($this->dbTableName)->getStructure();
         $this->assertEquals(array_keys($this->fixture[0]), array_keys($structure));

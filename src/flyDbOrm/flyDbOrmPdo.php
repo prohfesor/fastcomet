@@ -44,6 +44,15 @@ class flyDbOrmPdo extends flyDbOrm
     }
 
 
+    public function create($params =array()){
+        $object = new self($this->db, $this->tableName, $this->getClassName());
+        if(!empty($params)){
+            $object->set($params);
+        }
+        return $object;
+    }
+
+
     /**
      * Get this class for specified table - useful for fetching rows.
      * @param $tableName
