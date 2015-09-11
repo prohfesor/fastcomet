@@ -44,6 +44,9 @@ class flyDbOrmPdo extends flyDbOrm
     }
 
 
+    /**
+     * @inheritdoc
+     */
     public function create($params =array()){
         $object = new self($this->db, $this->tableName, $this->getClassName());
         if(!empty($params)){

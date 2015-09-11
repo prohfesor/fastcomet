@@ -42,6 +42,15 @@ abstract class flyDbOrm
      */
     abstract public function findOneBy($criteria =array());
 
+
+    /**
+     * Create new object.
+     * If array of $values passed - set them.
+     * @param array $values
+     * @return mixed
+     */
+    abstract public function create($values =array());
+
     /**
      * Set new values
      * @param array $values
