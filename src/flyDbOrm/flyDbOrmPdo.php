@@ -19,6 +19,11 @@ class flyDbOrmPdo extends flyDbOrm
     private $idColumn;
 
 
+    /**
+     * @param $db - database link
+     * @param null $tableName - database table
+     * @param null $className - class of fetched objects
+     */
     public function __construct($db, $tableName =null, $className =null) {
         $this->db = $db;
         $this->tableName = $tableName;
@@ -70,7 +75,7 @@ class flyDbOrmPdo extends flyDbOrm
     }
 
 
-    public function getIdColumn() {
+    private function getIdColumn() {
         return (!empty($this->idColumn)) ? $this->idColumn : "id";
     }
 
