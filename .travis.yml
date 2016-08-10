@@ -11,7 +11,7 @@ before_script:
   - cd ./tests/
 # travis uses older phpunit build which don't support  $this->createArrayDataSet(array()), so we force download of latest stable
 #  - wget https://phar.phpunit.de/phpunit.phar --no-check-certificate
-  - wget https://phar.phpunit.de/phpunit-old.phar --no-check-certificate
+  - wget https://phar.phpunit.de/phpunit-old.phar --no-check-certificate -O phpunit.phar
 
 script:
   php phpunit.phar ./ --coverage-text --whitelist=./src/
