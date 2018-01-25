@@ -1,9 +1,12 @@
+dist: trusty
 language: php
 php:
   - 5.4
   - 5.5
   - 5.6
   - 7.0
+  - 7.1
+  - 7.2
   - hhvm
 # hhvm php machine didn't want to download another phpunit.phar, so we disabling it till they upgrade their phpunit
 
