@@ -32,6 +32,12 @@ class flyRouting {
      */
     function match($path)
     {
+	$get_params = "";
+        $is_get = strpos($path, "?");
+        if($is_get){
+            $get_params = substr($path, $is_get+1);
+            $path = substr($path, 0, $is_get);
+        }
         $path = ("/"!=substr($path,0,1)) ? "/".$path : $path ;
         foreach($this->aRoutes as $route=>$params){
             $route = ("/"!=substr($route,0,1)) ? "/".$route : $route ;
